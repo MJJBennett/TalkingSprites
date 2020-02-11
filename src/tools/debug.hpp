@@ -25,11 +25,10 @@ void warn(const Tn&... tn)
     std::cout << std::endl;
 }
 
-template <int priority, typename T, typename... Tn>
-void message(const T& t, const Tn&... tn)
+template <int priority, typename... Tn>
+void message(const Tn&... tn)
 {
     if constexpr (priority < 1) return;
-    ::ts::log::print(t);
     ::ts::log::print(std::forward<const Tn&>(tn)...); 
     std::cout << std::endl;
 }

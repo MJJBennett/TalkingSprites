@@ -23,6 +23,7 @@ ts::Keyboard::Keyboard(const std::string& file) : filename(file)
     default_key(ts::key::path_up, sf::Keyboard::Key::W);
     default_key(ts::key::path_left, sf::Keyboard::Key::A);
     default_key(ts::key::path_right, sf::Keyboard::Key::D);
+    default_key(ts::key::rebind_key, sf::Keyboard::Key::P);
 
     save();
 }
@@ -35,7 +36,11 @@ ts::key ts::Keyboard::get_key(const sf::Keyboard::Key& k)
 
 void ts::Keyboard::default_key(ts::key internal_key, sf::Keyboard::Key sfml_key)
 {
-    if (keymap.find(sfml_key) == keymap.end()) keymap.emplace(sfml_key, internal_key);
+    if (keymap.find(sfml_key) == keymap.end())
+    {
+        ts::log::message<1>("Adding default key bind to: ", to_string(internal_key));
+        keymap.emplace(sfml_key, internal_key);
+    }
 }
 
 void ts::Keyboard::save()
@@ -52,4 +57,47 @@ void ts::Keyboard::save()
     {
         ofs << static_cast<int>(mapping.second) << "=" << mapping.first << "\n";
     }
+}
+
+bool ts::Keyboard::rebind(const sf::Keyboard::Key k)
+{
+    if (!rebind_started)
+    {
+        if (get_key(k) == ts::key::rebind_key)
+        {
+            ts::log::message<2>("Starting to rebind a key.");
+            rebind_started = true;
+            return true;
+        }
+        return false;
+    }
+
+    if (original_key)
+    {
+        if (auto itr = keymap.find(*original_key);
+            itr != keymap.end() && keymap.find(k) == keymap.end())
+        {
+            const ts::key dest = itr->second;
+            keymap.erase(itr);
+            keymap.emplace(k, dest);
+            ts::log::message<2>("Rebinding key successful. Rebound to: ", k);
+            save();
+        }
+        original_key.reset();
+        rebind_started = false;
+    }
+    else
+    {
+        if (keymap.find(k) == keymap.end())
+        {
+            rebind_started = false;
+        }
+        else
+        {
+            ts::log::message<2>("Rebinding key: ", k);
+            original_key = k;
+        }
+    }
+
+    return true;
 }

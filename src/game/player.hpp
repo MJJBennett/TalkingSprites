@@ -8,7 +8,6 @@ namespace ts
 class Player : public Character
 {
 public:
-    Player() = default;
 };
 }  // namespace ts
 

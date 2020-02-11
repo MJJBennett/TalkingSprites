@@ -21,19 +21,12 @@ int ts::Application::launch()
     sf::RenderWindow window(sf::VideoMode(800, 600), "Talking Sprites");
     window.setFramerateLimit(120);
     ts::Renderer renderer(window);
-    const auto player_id =
-        renderer.load_sprite(renderer.load_texture("resources/sprites/player_0.png"));
     const auto grass_id =
         renderer.load_sprite(renderer.load_texture("resources/sprites/grass_0.png"));
-    renderer.get_sprite(player_id).setPosition(50, 50);
     start_imgui(window);
 
-    // Testing code
-    sf::RectangleShape rect({80.f, 80.f});
-    rect.setFillColor(sf::Color::Green);
-
     ts::Chat chat;
-    ts::Game game;
+    ts::Game game(renderer);
 
     while (window.isOpen())
     {
@@ -74,8 +67,7 @@ int ts::Application::launch()
                 renderer.render(grass_id);
             }
         }
-        renderer.render(rect);
-        renderer.render(player_id);
+        game.render();
         isf::Render(window);  // Render ImGui last
         window.display();
     }

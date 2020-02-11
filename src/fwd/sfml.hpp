@@ -8,6 +8,7 @@ class RenderWindow;
 class Drawable;
 class Keyboard;
 class Event;
+class Sprite;
 }
 
 #endif  // TS_SFML_FWD_HPP
