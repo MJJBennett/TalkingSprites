@@ -34,13 +34,21 @@ add_executable(TalkingSprites
     ${CMAKE_SOURCE_DIR}/src/game/state.hpp
     ${CMAKE_SOURCE_DIR}/src/game/character.hpp
 
+    # Player / Implementation files
     ${CMAKE_SOURCE_DIR}/src/game/player.cpp ${CMAKE_SOURCE_DIR}/src/game/player.hpp
 
+    # Graphics / Render files
+    ${CMAKE_SOURCE_DIR}/src/graphics/renderer.cpp ${CMAKE_SOURCE_DIR}/src/graphics/renderer.hpp
+
+    # Widget / Window files
+    ${CMAKE_SOURCE_DIR}/src/widgets/chat.cpp ${CMAKE_SOURCE_DIR}/src/widgets/chat.hpp
+
+    # Web resource files
     ${CMAKE_SOURCE_DIR}/src/web/client.cpp ${CMAKE_SOURCE_DIR}/src/web/client.hpp
     ${CMAKE_SOURCE_DIR}/src/web/server.cpp ${CMAKE_SOURCE_DIR}/src/web/server.hpp
 
+    # Main application files
     ${CMAKE_SOURCE_DIR}/src/application.cpp ${CMAKE_SOURCE_DIR}/src/application.hpp
-
     ${CMAKE_SOURCE_DIR}/src/main.cpp
 )
 
