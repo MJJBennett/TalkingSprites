@@ -36,6 +36,8 @@ add_executable(TalkingSprites
 
     # Player / Implementation files
     ${CMAKE_SOURCE_DIR}/src/game/player.cpp ${CMAKE_SOURCE_DIR}/src/game/player.hpp
+    ${CMAKE_SOURCE_DIR}/src/game/game.cpp ${CMAKE_SOURCE_DIR}/src/game/game.hpp
+    ${CMAKE_SOURCE_DIR}/src/game/keyboard.cpp ${CMAKE_SOURCE_DIR}/src/game/keyboard.hpp
 
     # Graphics / Render files
     ${CMAKE_SOURCE_DIR}/src/graphics/renderer.cpp ${CMAKE_SOURCE_DIR}/src/graphics/renderer.hpp
