@@ -3,7 +3,9 @@
 
 namespace sf
 {
-class sf::Font;
+class Font;
+class RenderWindow;
+class Drawable;
 }
 
 #endif  // TS_SFML_FWD_HPP
