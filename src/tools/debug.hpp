@@ -22,6 +22,7 @@ template <typename... Tn>
 void warn(const Tn&... tn)
 {
     ::ts::log::print("Warning: ", std::forward<const Tn&>(tn)...);
+    std::cout << std::endl;
 }
 
 template <int priority, typename T, typename... Tn>
