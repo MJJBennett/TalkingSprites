@@ -1,0 +1,27 @@
+# IDE configuration folders
+.idea/
+.vs/
+
+# Build folders
+__pycache__/
+cmake-build-debug/
+out/
+output/
+enc_temp_folder/
+
+# Local configurations
+compile_commands.json
+CMakeSettings.json
+
+# Ignorable extensions
+*.swp
+*.mdj
+*.tmp
+*.ignore
+
+# Ignore dependencies for now
+deps/
+resources/
+
+# Also ignore scripts
+scripts/
