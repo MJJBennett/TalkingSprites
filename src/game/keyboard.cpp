@@ -14,7 +14,7 @@ ts::Keyboard::Keyboard(const std::string& file) : filename(file)
         const auto sfml_id     = ts::tools::stoi(keycode);
         if (!internal_id || !sfml_id) continue;
         // Now we have a keymapping to actually deal with
-        keymap[static_cast<sf::Keyboard::Key>(*sfml_id)] = static_cast<ts::key>(*internal_id);
+        set_map(static_cast<ts::key>(*internal_id), static_cast<sf::Keyboard::Key>(*sfml_id));
     }
 
     // Now we have a few necessary defaults
@@ -36,11 +36,33 @@ ts::key ts::Keyboard::get_key(const sf::Keyboard::Key& k)
 
 void ts::Keyboard::default_key(ts::key internal_key, sf::Keyboard::Key sfml_key)
 {
-    if (keymap.find(sfml_key) == keymap.end())
+    if (keymap.find(sfml_key) == keymap.end() && bound.find(internal_key) == bound.end())
     {
         ts::log::message<1>("Adding default key bind to: ", to_string(internal_key));
-        keymap.emplace(sfml_key, internal_key);
+        set_map(internal_key, sfml_key);
     }
+}
+
+void ts::Keyboard::set_map(ts::key internal_key, sf::Keyboard::Key sfml_key)
+{
+    /** This is where things get a little interesting.
+     * The behaviour of the function depends a lot on the case.
+     * We don't want to make any changes if the keyboard key
+     * is already bound - that's dangerous, currently.
+     * If the ts::key is already bound, we need to update the
+     * mapping, NOT just write a new one.
+     */
+    // Keyboard key already bound
+    if (keymap.find(sfml_key) != keymap.end()) return;
+
+    if (bound.find(internal_key) != bound.end())
+    {
+        // Internal key already has a bind, unbind it first
+        keymap.erase(bound[internal_key]);
+        bound.erase(internal_key);
+    }
+    bound.emplace(internal_key, sfml_key);
+    keymap.emplace(sfml_key, internal_key);
 }
 
 void ts::Keyboard::save()

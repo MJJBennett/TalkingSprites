@@ -10,7 +10,7 @@ namespace ts
 {
 enum class key
 {
-    close_game,
+    close_game = 0,
     path_left,
     path_right,
     path_down,
@@ -44,10 +44,13 @@ public:
     ts::key get_key(const sf::Keyboard::Key& k);
     void default_key(ts::key internal_key, sf::Keyboard::Key sfml_key);
 
+    void set_map(ts::key internal_key, sf::Keyboard::Key sfml_key);
+
     void save();
 
 private:
     std::unordered_map<sf::Keyboard::Key, ts::key> keymap;
+    std::unordered_map<ts::key, sf::Keyboard::Key> bound;
     std::string filename;
 
     std::optional<sf::Keyboard::Key> original_key;

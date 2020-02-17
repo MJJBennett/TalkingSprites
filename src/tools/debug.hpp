@@ -25,6 +25,13 @@ void warn(const Tn&... tn)
     std::cout << std::endl;
 }
 
+template <typename... Tn>
+void error(const Tn&... tn)
+{
+    ::ts::log::print("Error: ", std::forward<const Tn&>(tn)...);
+    std::cout << std::endl;
+}
+
 template <int priority, typename... Tn>
 void message(const Tn&... tn)
 {

@@ -23,5 +23,6 @@ CMakeSettings.json
 deps/
 resources/
 
-# Also ignore scripts
+# Also ignore scripts & notes
 scripts/
+imgui.txt

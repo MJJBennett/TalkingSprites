@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 
 project(TalkingSprites LANGUAGES CXX)
+project(TalkingSpritesServer LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -38,6 +39,7 @@ add_executable(TalkingSprites
     ${CMAKE_SOURCE_DIR}/src/game/player.cpp ${CMAKE_SOURCE_DIR}/src/game/player.hpp
     ${CMAKE_SOURCE_DIR}/src/game/game.cpp ${CMAKE_SOURCE_DIR}/src/game/game.hpp
     ${CMAKE_SOURCE_DIR}/src/game/keyboard.cpp ${CMAKE_SOURCE_DIR}/src/game/keyboard.hpp
+    ${CMAKE_SOURCE_DIR}/src/game/world.cpp ${CMAKE_SOURCE_DIR}/src/game/world.hpp
 
     # Graphics / Render files
     ${CMAKE_SOURCE_DIR}/src/graphics/renderer.cpp ${CMAKE_SOURCE_DIR}/src/graphics/renderer.hpp
@@ -47,15 +49,21 @@ add_executable(TalkingSprites
 
     # Web resource files
     ${CMAKE_SOURCE_DIR}/src/web/client.cpp ${CMAKE_SOURCE_DIR}/src/web/client.hpp
-    ${CMAKE_SOURCE_DIR}/src/web/server.cpp ${CMAKE_SOURCE_DIR}/src/web/server.hpp
 
     # Main application files
     ${CMAKE_SOURCE_DIR}/src/application.cpp ${CMAKE_SOURCE_DIR}/src/application.hpp
     ${CMAKE_SOURCE_DIR}/src/main.cpp
 )
 
+add_executable(TalkingSpritesServer
+    ${CMAKE_SOURCE_DIR}/src/web/server_main.cpp
+
+    ${CMAKE_SOURCE_DIR}/src/web/server.cpp ${CMAKE_SOURCE_DIR}/src/web/server.hpp
+)
+
 if (APPLE)
     target_compile_options(TalkingSprites PRIVATE -Werror -Wall -Wextra)
+    target_compile_options(TalkingSpritesServer PRIVATE -Werror -Wall -Wextra)
 endif ()
 
 # Link the application
@@ -64,3 +72,7 @@ target_link_libraries(TalkingSprites PRIVATE ImGui-SFML::ImGui-SFML)
 target_link_libraries(TalkingSprites PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(TalkingSprites PRIVATE ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(TalkingSprites PRIVATE ${Boost_LIBRARIES})
+
+target_link_libraries(TalkingSpritesServer PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(TalkingSpritesServer PRIVATE ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(TalkingSpritesServer PRIVATE ${Boost_LIBRARIES})

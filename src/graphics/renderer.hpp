@@ -12,6 +12,8 @@
 
 namespace ts
 {
+class World;
+
 class Renderer
 {
 public:
@@ -23,18 +25,21 @@ public:
 
     void render(sf::Drawable& d);
     void render(const SpriteHandle& d);
+    void render(const ts::World& w);
 
     sf::Sprite& get_sprite(ts::SpriteHandle s);
     sf::Sprite get_sprite(ts::TextureHandle t);
 
     [[nodiscard]] TextureHandle load_texture(const std::string& path);
     [[nodiscard]] SpriteHandle load_sprite(const ts::TextureHandle& t);
+    void load_tile(const ts::TextureHandle& t);
 
 private:
     sf::RenderWindow& window;
 
     std::vector<std::unique_ptr<sf::Texture>> texture_map;
     std::vector<sf::Sprite> sprite_map;
+    std::vector<sf::Sprite> tile_map;
 };
 }  // namespace ts
 

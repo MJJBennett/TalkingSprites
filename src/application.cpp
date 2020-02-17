@@ -1,10 +1,13 @@
 #include "application.hpp"
 
 #include "game/game.hpp"
+#include "game/world.hpp"
 #include "tools/debug.hpp"
 #include "tools/string.hpp"
 #include "widgets/chat.hpp"
+#include "web/client.hpp"
 
+#include <thread>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
@@ -21,12 +24,23 @@ int ts::Application::launch()
     sf::RenderWindow window(sf::VideoMode(800, 600), "Talking Sprites");
     window.setFramerateLimit(120);
     ts::Renderer renderer(window);
-    const auto grass_id =
-        renderer.load_sprite(renderer.load_texture("resources/sprites/grass_0.png"));
+    const auto grass_text = renderer.load_texture("resources/sprites/grass_0.png");
+    // const auto grass_id =
+    //   renderer.load_sprite(grass_text);
+    renderer.load_tile(grass_text);
+    renderer.load_tile(renderer.load_texture("resources/sprites/rocks_0.png"));
+    World w;
+    w.load_area(0, 0);
+    w.load_area(1, 1);
+    w.load_area(1, 0);
+    w.load_area(0, 1);
     start_imgui(window);
 
     ts::Chat chat;
     ts::Game game(renderer);
+
+    ts::web::Client c{"127.0.0.1"};
+    std::thread th{&ts::web::Client::launch, &c};
 
     while (window.isOpen())
     {
@@ -56,17 +70,21 @@ int ts::Application::launch()
 
         isf::Update(window, delta.restart());
 
-        chat.chat();
+        if (auto cm = chat.chat(); cm)
+        {
+            c.send(*cm);
+        }
 
         window.clear();
-        for (int x = 0; x < 10; x++)
-        {
-            for (int y = 0; y < 10; y++)
-            {
-                renderer.get_sprite(grass_id).setPosition(x * 32, y * 32);
-                renderer.render(grass_id);
-            }
-        }
+        // for (int x = 0; x < 10; x++)
+        //{
+        //   for (int y = 0; y < 10; y++)
+        //  {
+        //     renderer.get_sprite(grass_id).setPosition(x * 32, y * 32);
+        //    renderer.render(grass_id);
+        //}
+        //}
+        renderer.render(w);
         game.render();
         isf::Render(window);  // Render ImGui last
         window.display();

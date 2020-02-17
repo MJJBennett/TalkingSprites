@@ -5,7 +5,7 @@
 ts::Game::Game(ts::Renderer& r) : renderer(r)
 {
     player.set_sprite(
-        renderer.load_sprite(renderer.load_texture("resources/sprites/player_0.png")));
+        renderer.load_sprite(renderer.load_texture("resources/sprites/player_1.png")));
 }
 
 ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)

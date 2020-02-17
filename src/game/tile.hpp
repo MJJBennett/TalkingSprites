@@ -7,7 +7,7 @@ struct Tile
 {
     enum class Type
     {
-        grass,
+        grass = 0,
         rock
     } type = Type::grass;
 };
