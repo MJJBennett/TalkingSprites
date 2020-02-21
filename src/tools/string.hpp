@@ -38,6 +38,11 @@ inline std::optional<int> stoi(const std::string& s)
         return {};
     }
 }
+
+inline bool is_whitespace(const char in)
+{
+    return in == ' ' || in == '\n' || in == '\r';
+}
 }  // namespace ts::tools
 
 #endif  // TS_STRINGTOOLS_HPP

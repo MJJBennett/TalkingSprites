@@ -49,6 +49,7 @@ add_executable(TalkingSprites
 
     # Web resource files
     ${CMAKE_SOURCE_DIR}/src/web/client.cpp ${CMAKE_SOURCE_DIR}/src/web/client.hpp
+    ${CMAKE_SOURCE_DIR}/src/game/client.cpp ${CMAKE_SOURCE_DIR}/src/game/client.hpp
 
     # Main application files
     ${CMAKE_SOURCE_DIR}/src/application.cpp ${CMAKE_SOURCE_DIR}/src/application.hpp
@@ -56,9 +57,10 @@ add_executable(TalkingSprites
 )
 
 add_executable(TalkingSpritesServer
-    ${CMAKE_SOURCE_DIR}/src/web/server_main.cpp
+    ${CMAKE_SOURCE_DIR}/src/main_server.cpp
 
     ${CMAKE_SOURCE_DIR}/src/web/server.cpp ${CMAKE_SOURCE_DIR}/src/web/server.hpp
+    ${CMAKE_SOURCE_DIR}/src/game/server.cpp ${CMAKE_SOURCE_DIR}/src/game/server.hpp
 )
 
 if (APPLE)
