@@ -90,6 +90,10 @@ int ts::Application::launch()
         window.display();
     }
 
+    ts::log::message<1>("Application: Shutting down web client.");
+    c.shutdown();
+    th.join();
+
     return 0;
 }
 
