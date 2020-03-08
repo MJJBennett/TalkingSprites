@@ -28,8 +28,9 @@ void ts::GameServer::on_connect(web::UserID id)
     users.try_emplace(id, ts::User(id));
     users.at(id).pos = state.players.size();
     state.players.emplace_back();
+    state.players.back().id = '0' + static_cast<int>(state.players.size());
     // Now we need to respond with a message to request their username
-    server.write({id}, "[U] Username Request");
+    server.write({id}, username_request_str + state.players.back().id);
 }
 
 void ts::GameServer::on_read(web::UserID id, std::string message)
@@ -158,13 +159,16 @@ void ts::GameServer::update_player(web::UserID id, std::string str)
         // Make sure the player isn't cheating!
         if (nx > x) player.move_right();
         if (nx < x) player.move_left();
-        if (ny > y) player.move_up();
-        if (ny < y) player.move_down();
+        // this works this way because of rendering and things
+        if (ny < y) player.move_up();
+        if (ny > y) player.move_down();
         const auto [npx, npy] = player.get_position();
         const auto rxs = std::to_string(npx);
         const auto rys = std::to_string(npy);
         // Now we can send this update back, as we're only parsing positions
-        send_all(ts::player_update_str + player.id + "|" + rxs + '|' + rys + '|');
+        const std::string update_str = ts::player_update_str + player.id + "|" + rxs + '|' + rys + '|';
+        ts::log::message<1>("Game Server: Sending out update string: ", update_str);
+        send_all(update_str);
     }
 }
 

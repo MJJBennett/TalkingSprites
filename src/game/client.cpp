@@ -17,6 +17,7 @@ void ts::GameClient::on_read(std::string message)
         }
         case 'U':  // need username
             client.send(ts::username_update_str + "MyUsername");
+            game_updates.push(message);
             break;
         default:
             game_updates.push(message);
