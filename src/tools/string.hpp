@@ -27,6 +27,13 @@ auto splitn(const std::string& str, const char delim = '=') -> std::array<std::s
     return ret;
 }
 
+template <int N>
+auto split_get_nth(const std::string& str, const char delim = '=') -> std::string
+{
+    const auto arr = ::ts::tools::splitn<N + 2>(str, delim); 
+    return arr[N];
+}
+
 inline std::optional<int> stoi(const std::string& s)
 {
     try
@@ -42,6 +49,12 @@ inline std::optional<int> stoi(const std::string& s)
 inline bool is_whitespace(const char in)
 {
     return in == ' ' || in == '\n' || in == '\r';
+}
+
+// Does a start with b?
+inline bool startswith(const std::string& a, const std::string& b)
+{
+    return a.size() >= b.size() && a.substr(0, b.size()) == b;
 }
 }  // namespace ts::tools
 

@@ -1,8 +1,9 @@
 #ifndef TS_GAMESTATE_HPP
 #define TS_GAMESTATE_HPP
 
+#include "game/character.hpp"
+#include "game/player.hpp"
 #include "game/tile.hpp"
-#include "game/char.hpp"
 
 #include <vector>
 
@@ -15,17 +16,13 @@ namespace ts
 {
 struct TileState
 {
-    std::vector<CharID> characters;
+    //    std::vector<CharID> characters;
 };
 
-class GameState
+struct GameState
 {
-public:
-     
-
-private:
-
+    std::vector<ts::Player> players;
 };
-}
+}  // namespace ts
 
-#endif // TS_GAMESTATE_HPP
+#endif  // TS_GAMESTATE_HPP

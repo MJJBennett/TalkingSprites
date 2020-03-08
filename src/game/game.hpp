@@ -2,13 +2,14 @@
 #define TS_GAME_HPP
 
 #include "game/keyboard.hpp"
-#include "game/player.hpp"
+#include "game/state.hpp"
 
 #include <SFML/Window/Event.hpp>
 
 namespace ts
 {
 class Renderer;
+class GameClient;
 
 class Game
 {
@@ -20,15 +21,18 @@ public:
     };
 
 public:
-    Game(ts::Renderer& r);
+    Game(ts::Renderer& r, ts::GameClient& c);
 
     void render();
+    void update();
 
     Response handle_keyevent(const sf::Event& e);
 
 private:
-    ts::Player player;
+    ts::GameState state;
+    ts::TextureHandle default_player{};
     ts::Renderer& renderer;
+    ts::GameClient& client;
     Keyboard keyboard{"resources/config/keyfile.dump"};
 };
 }  // namespace ts

@@ -5,9 +5,8 @@
 #include "tools/debug.hpp"
 #include "tools/string.hpp"
 #include "widgets/chat.hpp"
-#include "web/client.hpp"
+#include "game/client.hpp"
 
-#include <thread>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
@@ -37,10 +36,9 @@ int ts::Application::launch()
     start_imgui(window);
 
     ts::Chat chat;
-    ts::Game game(renderer);
 
-    ts::web::Client c{"127.0.0.1"};
-    std::thread th{&ts::web::Client::launch, &c};
+    ts::GameClient c(chat);
+    ts::Game game(renderer, c);
 
     while (window.isOpen())
     {
@@ -72,8 +70,11 @@ int ts::Application::launch()
 
         if (auto cm = chat.chat(); cm)
         {
-            c.send(*cm);
+            c.send_chat(*cm);
         }
+
+        c.poll(); // Gets web updates
+        game.update();
 
         window.clear();
         // for (int x = 0; x < 10; x++)
@@ -92,7 +93,6 @@ int ts::Application::launch()
 
     ts::log::message<1>("Application: Shutting down web client.");
     c.shutdown();
-    th.join();
 
     return 0;
 }
