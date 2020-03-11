@@ -3,12 +3,13 @@
 
 #include "fwd/sfml.hpp"
 #include "graphics/resource.hpp"
+#include "tools/serializable.hpp"
 
 #include <array>
 
 namespace ts
 {
-class Character
+class Character : public ::ts::serializable
 {
 public:
     void set_position(int x_, int y_)
@@ -44,6 +45,11 @@ public:
     ts::SpriteHandle get_sprite() { return handle; }
 
     void sync(sf::Sprite& sprite);
+
+    // Serialization
+    std::string get_string() const override;
+    void from_string(std::string) override;
+    virtual ~Character() = default;
 
     char id = ' ';
     bool updated{false};

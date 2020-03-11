@@ -16,7 +16,7 @@ class GameClient
 public:
     GameClient(ts::Chat&);
 
-    void send_chat(const std::string& message) { client.send(ts::chat_update_str + message); }
+    void send_chat(const std::string& message);
 
     void send(std::string message) { client.send(std::move(message)); }
 

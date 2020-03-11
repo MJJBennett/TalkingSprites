@@ -34,6 +34,18 @@ auto split_get_nth(const std::string& str, const char delim = '=') -> std::strin
     return arr[N];
 }
 
+inline std::optional<long> stol(const std::string& s)
+{
+    try
+    {
+        return std::stol(s);
+    }
+    catch (const std::invalid_argument& e)
+    {
+        return {};
+    }
+}
+
 inline std::optional<int> stoi(const std::string& s)
 {
     try

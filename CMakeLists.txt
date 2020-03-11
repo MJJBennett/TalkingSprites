@@ -48,6 +48,7 @@ add_executable(TalkingSprites
     ${CMAKE_SOURCE_DIR}/src/widgets/chat.cpp ${CMAKE_SOURCE_DIR}/src/widgets/chat.hpp
 
     # Web resource files
+    ${CMAKE_SOURCE_DIR}/src/web/user.cpp ${CMAKE_SOURCE_DIR}/src/web/user.hpp
     ${CMAKE_SOURCE_DIR}/src/web/client.cpp ${CMAKE_SOURCE_DIR}/src/web/client.hpp
     ${CMAKE_SOURCE_DIR}/src/game/client.cpp ${CMAKE_SOURCE_DIR}/src/game/client.hpp
 
@@ -58,6 +59,11 @@ add_executable(TalkingSprites
 
 add_executable(TalkingSpritesServer
     ${CMAKE_SOURCE_DIR}/src/main_server.cpp
+
+    # Files for the game server
+    ${CMAKE_SOURCE_DIR}/src/game/character.cpp ${CMAKE_SOURCE_DIR}/src/game/character.hpp
+    ${CMAKE_SOURCE_DIR}/src/game/player.cpp ${CMAKE_SOURCE_DIR}/src/game/player.hpp
+    ${CMAKE_SOURCE_DIR}/src/game/world.cpp ${CMAKE_SOURCE_DIR}/src/game/world.hpp
 
     ${CMAKE_SOURCE_DIR}/src/web/server.cpp ${CMAKE_SOURCE_DIR}/src/web/server.hpp
     ${CMAKE_SOURCE_DIR}/src/game/server.cpp ${CMAKE_SOURCE_DIR}/src/game/server.hpp
@@ -75,6 +81,7 @@ target_link_libraries(TalkingSprites PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(TalkingSprites PRIVATE ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(TalkingSprites PRIVATE ${Boost_LIBRARIES})
 
+target_link_libraries(TalkingSpritesServer PRIVATE sfml-graphics) # necessary for now due to character.cpp inclusion
 target_link_libraries(TalkingSpritesServer PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(TalkingSpritesServer PRIVATE ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(TalkingSpritesServer PRIVATE ${Boost_LIBRARIES})

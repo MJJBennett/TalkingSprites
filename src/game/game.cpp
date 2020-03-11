@@ -21,8 +21,9 @@ void ts::Game::update()
         {
             case 'P':
             {
+                const auto update_substr = update.substr(player_update_str.size());
                 const auto [id, nxs, nys, other] =
-                    ts::tools::splitn<4>(update.substr(player_update_str.size()), '|');
+                    ts::tools::splitn<4>(update_substr, '|');
                 bool found     = false;
                 const auto nxo = ts::tools::stoi(nxs);
                 const auto nyo = ts::tools::stoi(nys);
@@ -34,7 +35,7 @@ void ts::Game::update()
                         ts::log::message<1>("Game: Updating player at id(", id[0],
                                             ") and position(", *nxo, ", ", *nyo, ")");
                         found = true;
-                        p.set_position(*nxo, *nyo);
+                        p.from_string(update_substr);
                         p.sync(renderer.get_sprite(p.get_sprite()));
                         break;
                     }
@@ -44,8 +45,7 @@ void ts::Game::update()
                     ts::log::message<1>("Game: Adding new player at id(", id[0], ") and position(",
                                         *nxo, ", ", *nyo, ")");
                     state.players.emplace_back();
-                    state.players.back().id = id[0];
-                    state.players.back().set_position(*nxo, *nyo);
+                    state.players.back().from_string(update_substr);
                     state.players.back().set_sprite(renderer.load_sprite(default_player));
                     state.players.back().sync(
                         renderer.get_sprite(state.players.back().get_sprite()));
@@ -95,9 +95,7 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
 
     if (state.players[0].updated)
     {
-        const auto [x, y] = state.players[0].get_position();
-        client.send(ts::player_update_str + '|' + std::to_string(x) + '|' + std::to_string(y) +
-                    '|');
+        client.send(ts::player_update_str + state.players[0].get_string());
     }
     return Response::none;
 }

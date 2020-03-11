@@ -77,6 +77,11 @@ void ts::GameServer::on_read(web::UserID id, std::string message)
             update_player(id, message.substr(ts::player_update_str.size()));
             break;
         }
+        case 'S':
+        {
+            // Client requests [S]tatus, we send [S]tatus back!
+            respond_status(id);
+        }
         default: ts::log::warn("Game Server: Ignoring message."); break;
     }
 }
@@ -148,7 +153,7 @@ void ts::GameServer::update_player(web::UserID id, std::string str)
     auto& player   = state.players[pos];
 
     const auto [x, y]            = player.get_position();
-    const auto [nxs, nys, other] = ts::tools::splitn<3>(str, '|');
+    const auto [ignore_id, nxs, nys, other] = ts::tools::splitn<4>(str, '|');
     const auto nxo               = ts::tools::stoi(nxs);
     const auto nyo               = ts::tools::stoi(nys);
     if (!nxo || !nyo) return;  // Failure
@@ -166,10 +171,25 @@ void ts::GameServer::update_player(web::UserID id, std::string str)
         const auto rxs = std::to_string(npx);
         const auto rys = std::to_string(npy);
         // Now we can send this update back, as we're only parsing positions
-        const std::string update_str = ts::player_update_str + player.id + "|" + rxs + '|' + rys + '|';
+        const std::string update_str = ts::player_update_str + player.get_string();
         ts::log::message<1>("Game Server: Sending out update string: ", update_str);
         send_all(update_str);
     }
+}
+
+void ts::GameServer::respond_status(web::UserID id)
+{
+    // This is where things start to get a bit crazy
+    std::string resp = ts::status_response_str;
+    auto push = [&resp](std::string str) { resp += std::move(str) + '\n'; };
+
+    for (const auto& p : state.players)
+    {
+        push(ts::stat_player + p.get_string());
+    }
+    push(ts::stat_world + world.get_string());
+    
+    server.write({id}, resp);
 }
 
 /**

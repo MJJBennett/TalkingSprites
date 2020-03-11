@@ -1,5 +1,7 @@
 #include "world.hpp"
 
+#include "tools/string.hpp"
+
 ts::Area ts::World::generate_area(long x, long y)
 {
     // https://stackoverflow.com/questions/22923551/generating-number-0-1-using-mersenne-twister-c
@@ -18,4 +20,25 @@ ts::Area ts::World::generate_area(long x, long y)
     }
 
     return a;
+}
+
+std::string ts::World::get_string() const
+{
+    constexpr char sep = '|';
+    // Serialize seed 
+    const auto seed_str = std::to_string(seed);
+    // Send everything
+    return seed_str + sep;
+}
+
+void ts::World::from_string(std::string str)
+{
+    constexpr char sep = '|';
+    // Split into values
+    const auto [seed_str, none] = ts::tools::splitn<2>(str, sep);
+    // Deserialize
+    if (const auto seed_opt = ts::tools::stol(seed_str); seed_opt)
+    {
+        seed = *seed_opt; 
+    }
 }

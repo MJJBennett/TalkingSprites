@@ -9,6 +9,11 @@ const std::string username_update_str = "[U] Username: ";
 const std::string username_request_str = "[U] Username Request: ";
 const std::string chat_update_str = "[C] Chat Message: ";
 const std::string player_update_str = "[P] ";
+const std::string status_request_str = "[S] Status Request";
+const std::string status_response_str = "[S] Status: ";
+
+const std::string stat_player = "A";
+const std::string stat_world = "B";
 
 struct GameUpdate
 {

@@ -33,6 +33,9 @@ int ts::Application::launch()
     w.load_area(1, 1);
     w.load_area(1, 0);
     w.load_area(0, 1);
+    w.load_area(2, 2);
+    w.load_area(2, 1);
+    w.load_area(1, 2);
     start_imgui(window);
 
     ts::Chat chat;

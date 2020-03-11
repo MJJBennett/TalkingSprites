@@ -4,6 +4,7 @@
 #include "web/server.hpp"
 #include "game/user.hpp"
 #include "game/state.hpp"
+#include "game/world.hpp"
 
 #include <vector>
 #include <unordered_map>
@@ -27,6 +28,7 @@ public:
 
     void run_command(web::UserID id, std::string command);
     void update_player(web::UserID id, std::string str);
+    void respond_status(web::UserID id);
 
 private:
     void on_connect(web::UserID id);
@@ -44,6 +46,7 @@ private:
     std::unordered_map<std::string, std::string> misc_config;
 
     ts::GameState state;
+    ts::World world{42};
 };
 }  // namespace ts
 
