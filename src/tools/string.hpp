@@ -5,6 +5,7 @@
 #include <array>
 #include <optional>
 #include <string>
+#include <vector>
 
 namespace ts::tools
 {
@@ -27,10 +28,27 @@ auto splitn(const std::string& str, const char delim = '=') -> std::array<std::s
     return ret;
 }
 
+inline std::vector<std::string> splitv(const std::string& str, const char delim = '=')
+{
+    std::vector<std::string> ret;
+
+    const auto is_delim = [delim](const char arg) { return arg == delim; };
+
+    for (auto itr = str.begin(); itr != str.end();)
+    {
+        itr                   = std::find_if_not(itr, str.end(), is_delim);
+        const auto substr_end = std::find_if(itr, str.end(), is_delim);
+        ret.emplace_back(itr, substr_end);
+        itr = substr_end;
+    }
+
+    return ret;
+}
+
 template <int N>
 auto split_get_nth(const std::string& str, const char delim = '=') -> std::string
 {
-    const auto arr = ::ts::tools::splitn<N + 2>(str, delim); 
+    const auto arr = ::ts::tools::splitn<N + 2>(str, delim);
     return arr[N];
 }
 
@@ -58,10 +76,7 @@ inline std::optional<int> stoi(const std::string& s)
     }
 }
 
-inline bool is_whitespace(const char in)
-{
-    return in == ' ' || in == '\n' || in == '\r';
-}
+inline bool is_whitespace(const char in) { return in == ' ' || in == '\n' || in == '\r'; }
 
 // Does a start with b?
 inline bool startswith(const std::string& a, const std::string& b)

@@ -21,35 +21,7 @@ void ts::Game::update()
         {
             case 'P':
             {
-                const auto update_substr = update.substr(player_update_str.size());
-                const auto [id, nxs, nys, other] =
-                    ts::tools::splitn<4>(update_substr, '|');
-                bool found     = false;
-                const auto nxo = ts::tools::stoi(nxs);
-                const auto nyo = ts::tools::stoi(nys);
-                if (!nxo || !nyo) break;
-                for (auto&& p : state.players)
-                {
-                    if (p.id == id[0])
-                    {
-                        ts::log::message<1>("Game: Updating player at id(", id[0],
-                                            ") and position(", *nxo, ", ", *nyo, ")");
-                        found = true;
-                        p.from_string(update_substr);
-                        p.sync(renderer.get_sprite(p.get_sprite()));
-                        break;
-                    }
-                }
-                if (!found)
-                {
-                    ts::log::message<1>("Game: Adding new player at id(", id[0], ") and position(",
-                                        *nxo, ", ", *nyo, ")");
-                    state.players.emplace_back();
-                    state.players.back().from_string(update_substr);
-                    state.players.back().set_sprite(renderer.load_sprite(default_player));
-                    state.players.back().sync(
-                        renderer.get_sprite(state.players.back().get_sprite()));
-                }
+                update_player(update);
                 break;
             }
             case 'U':
@@ -57,9 +29,66 @@ void ts::Game::update()
                 state.players[0].id = update.at(ts::username_request_str.size());
                 break;
             }
-            default: break;
+            case 'S':
+            {
+                // Game status, we need to load many things!
+
+                // We could make this a lot more efficient but we'll do it the fast
+                // way to get this working.
+                const auto str  = update.substr(ts::status_response_str.size());
+                const auto strs = ts::tools::splitv(str, '\n');
+                for (const auto& s : strs)
+                {
+                    if (s.empty()) continue;
+                    if (ts::tools::startswith(s, ts::stat_world))
+                    {
+                        continue;
+                    }
+                    if (ts::tools::startswith(s, ts::stat_player))
+                    {
+                        update_player(s.substr(ts::stat_player.size()));
+                        continue;
+                    }
+                }
+            }
+            default:
+            {
+                ts::log::warn("Game: Ignored update:\n", update);
+                break;
+            }
         }
         client.game_updates.pop();
+    }
+}
+
+void ts::Game::update_player(const std::string& str)
+{
+    const auto update_substr         = str.substr(player_update_str.size());
+    const auto [id, nxs, nys, other] = ts::tools::splitn<4>(update_substr, '|');
+    bool found                       = false;
+    const auto nxo                   = ts::tools::stoi(nxs);
+    const auto nyo                   = ts::tools::stoi(nys);
+    if (!nxo || !nyo) return;
+    for (auto&& p : state.players)
+    {
+        if (p.id == id[0])
+        {
+            ts::log::message<1>("Game: Updating player at id(", id[0], ") and position(", *nxo,
+                                ", ", *nyo, ")");
+            found = true;
+            p.from_string(update_substr);
+            p.sync(renderer.get_sprite(p.get_sprite()));
+            break;
+        }
+    }
+    if (!found)
+    {
+        ts::log::message<1>("Game: Adding new player at id(", id[0], ") and position(", *nxo, ", ",
+                            *nyo, ")");
+        state.players.emplace_back();
+        state.players.back().from_string(update_substr);
+        state.players.back().set_sprite(renderer.load_sprite(default_player));
+        state.players.back().sync(renderer.get_sprite(state.players.back().get_sprite()));
     }
 }
 

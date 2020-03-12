@@ -28,6 +28,8 @@ public:
 
     Response handle_keyevent(const sf::Event& e);
 
+    void update_player(const std::string& str);
+
 private:
     ts::GameState state;
     ts::TextureHandle default_player{};
