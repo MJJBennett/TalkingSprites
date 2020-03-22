@@ -12,7 +12,7 @@ class Chat
 {
 public:
     Chat();
-    std::optional<std::string> chat();
+    std::optional<std::string> chat(bool debug = false);
     void push(std::string msg) { chat_buffer.emplace_back(std::move(msg)); }
 
 private:
