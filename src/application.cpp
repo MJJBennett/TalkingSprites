@@ -6,6 +6,7 @@
 #include "tools/string.hpp"
 #include "widgets/chat.hpp"
 #include "game/client.hpp"
+#include "config.hpp"
 
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -16,11 +17,12 @@
 
 namespace isf = ImGui::SFML;
 
-int ts::Application::launch()
+int ts::Application::launch(int argc, char* argv[])
 {
+    ts::Config config(argc, argv);
     // Full application logic is all launched from
     // this function.
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Talking Sprites");
+    sf::RenderWindow window(sf::VideoMode(800, 600), config.name);
     window.setFramerateLimit(120);
     ts::Renderer renderer(window);
     const auto grass_text = renderer.load_texture("resources/sprites/grass_0.png");
@@ -36,14 +38,16 @@ int ts::Application::launch()
     w.load_area(2, 2);
     w.load_area(2, 1);
     w.load_area(1, 2);
+    w.load_area(0, 2);
+    w.load_area(2, 0);
     start_imgui(window);
 
     ts::Chat chat;
 
-    ts::GameClient c(chat);
-    ts::Game game(renderer, c);
+    ts::GameClient c(chat, config);
+    ts::Game game(renderer, c, w, config);
 
-    while (window.isOpen())
+    while (true)
     {
         sf::Event e;
         while (window.pollEvent(e))
@@ -60,6 +64,7 @@ int ts::Application::launch()
             {
                 if (e.type == sf::Event::KeyPressed || e.type == sf::Event::KeyReleased)
                 {
+                    if (game.debug) ts::log::message<1>("Application: Found key event.");
                     switch (game.handle_keyevent(e))
                     {
                         case ts::Game::Response::close_window: window.close(); break;
@@ -68,10 +73,11 @@ int ts::Application::launch()
                 }
             }
         }
+        if (!window.isOpen()) break;
 
         isf::Update(window, delta.restart());
 
-        if (auto cm = chat.chat(); cm)
+        if (auto cm = chat.chat(game.debug); cm)
         {
             c.send_chat(*cm);
         }

@@ -12,7 +12,7 @@ namespace ts
 class Application
 {
 public:
-    int launch();
+    int launch(int argc, char* argv[]);
 
     // For commandline configuration
     void configure(std::vector<std::string> args);
