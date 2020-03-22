@@ -124,7 +124,7 @@ void ts::GameServer::run_command(web::UserID id, std::string command)
     if (user_itr == users.end()) return;
     if (startswith(command, "/nick"))
     {
-        const auto nick = split_get_nth<1>(command, ' ');
+        const auto nick = splitn<2>(command, ' ')[1];
         if (!nick.empty())
         {
             user_itr->second.username = nick;
@@ -137,13 +137,25 @@ void ts::GameServer::run_command(web::UserID id, std::string command)
     {
         if (const auto& itr = misc_config.find("password"); itr != misc_config.end())
         {
-            if (itr->second == "" || split_get_nth<1>(command, ' ') == itr->second)
+            if (itr->second == "" || splitn<2>(command, ' ')[1] == itr->second)
             {
                 // Correct password
                 user_itr->second.op = true;
             }
         }
         return;
+    }
+
+    // Cannot be executed without permissions
+    if (!user_itr->second.op) return;
+    if (startswith(command, "/stop"))
+    {
+        send_all(ts::chat_update_str + "Server: Shutting down.");
+        server.shutdown();
+    }
+    if (startswith(command, "/say"))
+    {
+        send_all(ts::chat_update_str + "Server: " + splitn<2>(command, ' ')[1]);
     }
 }
 

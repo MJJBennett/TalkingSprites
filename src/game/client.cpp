@@ -3,6 +3,7 @@
 #include "tools/debug.hpp"
 #include "tools/string.hpp"
 #include "widgets/chat.hpp"
+#include "config.hpp"
 
 void ts::GameClient::on_read(std::string message)
 {
@@ -17,10 +18,12 @@ void ts::GameClient::on_read(std::string message)
             break;
         }
         case 'U':  // Specification: Username request to start connection
-            client.send(ts::username_update_str + "MyUsername");
+        {
+            client.send(ts::username_update_str + config.username);
             game_updates.push(message);
             client.send(ts::status_request_str);
             break;
+        }
         default:
             game_updates.push(message);
             break;
@@ -31,8 +34,8 @@ void ts::GameClient::on_read(std::string message)
     }
 }
 
-ts::GameClient::GameClient(ts::Chat& chat_)
-    : client{"127.0.0.1"}, th{}, chat(chat_)
+ts::GameClient::GameClient(ts::Chat& chat_, ts::Config& config_)
+    : client{config_.ip}, th{}, chat(chat_), config(config_)
 {
 }
 
@@ -49,11 +52,25 @@ void ts::GameClient::poll()
 void ts::GameClient::send_chat(const std::string& message)
 {
     using namespace ts::tools;
-    if (startswith(message, "/connect"))
+    if (startswith(message, "/co"))
     {
         client.shutdown();
+        if (up) th.join();
         th = std::thread{&ts::web::Client::launch, &client};
+        up = true;
         return;
+    }
+    else if (startswith(message, "/ni"))
+    {
+        const auto [cmd, arg] = ts::tools::splitn<2>(message, ' ');
+        if (!arg.empty())
+        {
+            config.username = arg;
+        }
+    }
+    else if (startswith(message, "/pr"))
+    {
+        const auto [cmd, args] = ts::tools::splitn<2>(message, ' ');
     }
     client.send(ts::chat_update_str + message);
 }

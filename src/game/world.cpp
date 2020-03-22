@@ -41,4 +41,9 @@ void ts::World::from_string(std::string str)
     {
         seed = *seed_opt; 
     }
+
+    for (auto& [k, v] : world)
+    {
+        v = generate_area(k.first, k.second);
+    }
 }

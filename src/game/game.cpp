@@ -1,15 +1,18 @@
 #include "game.hpp"
 
 #include "game/client.hpp"
+#include "game/world.hpp"
 #include "graphics/renderer.hpp"
 #include "tools/debug.hpp"
 #include "tools/string.hpp"
+#include "config.hpp"
 
-ts::Game::Game(ts::Renderer& r, ts::GameClient& c) : renderer(r), client(c)
+ts::Game::Game(ts::Renderer& r, ts::GameClient& c, ts::World& w, ts::Config& config_) : renderer(r), client(c), world(w), config(config_)
 {
     state.players.emplace_back();
-    default_player = renderer.load_texture("resources/sprites/player_1.png");
-    state.players[0].set_sprite(renderer.load_sprite(default_player));
+    default_player = renderer.load_texture("resources/sprites/player_01.png");
+    local_player = renderer.load_texture(config.avatar);
+    state.players[0].set_sprite(renderer.load_sprite(local_player));
 }
 
 void ts::Game::update()
@@ -21,7 +24,7 @@ void ts::Game::update()
         {
             case 'P':
             {
-                update_player(update);
+                update_player(update.substr(ts::player_update_str.size()));
                 break;
             }
             case 'U':
@@ -37,11 +40,13 @@ void ts::Game::update()
                 // way to get this working.
                 const auto str  = update.substr(ts::status_response_str.size());
                 const auto strs = ts::tools::splitv(str, '\n');
+                ts::log::message<1>("Game: Performing ", strs.size(), " status updates.");
                 for (const auto& s : strs)
                 {
                     if (s.empty()) continue;
                     if (ts::tools::startswith(s, ts::stat_world))
                     {
+                        update_world(s.substr(ts::stat_world.size()));
                         continue;
                     }
                     if (ts::tools::startswith(s, ts::stat_player))
@@ -50,6 +55,7 @@ void ts::Game::update()
                         continue;
                     }
                 }
+                break;
             }
             default:
             {
@@ -61,9 +67,17 @@ void ts::Game::update()
     }
 }
 
-void ts::Game::update_player(const std::string& str)
+void ts::Game::update_world(const std::string& update_substr)
 {
-    const auto update_substr         = str.substr(player_update_str.size());
+    // The fact that this is so simple makes me pretty happy
+    // In the future, proper serialization-deserialization might make
+    // this style of networked game really simple to implement, once
+    // serialization is taken care of.
+    world.from_string(update_substr);
+}
+
+void ts::Game::update_player(const std::string& update_substr)
+{
     const auto [id, nxs, nys, other] = ts::tools::splitn<4>(update_substr, '|');
     bool found                       = false;
     const auto nxo                   = ts::tools::stoi(nxs);
@@ -97,7 +111,7 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
     const bool press = e.type == sf::Event::KeyPressed;
     const auto key   = keyboard.get_key(e.key.code);
 
-    if (press) return Response::none;
+    if (!press) return Response::none;
 
     if (keyboard.rebind(e.key.code)) return Response::none;
     switch (key)
@@ -119,12 +133,23 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
             state.players[0].move_left();
             state.players[0].sync(renderer.get_sprite(state.players[0].get_sprite()));
             break;
+        case ts::key::close_chat: break;
+        case ts::key::open_chat: break;
+        case ts::key::toggle_debug:
+        {
+            debug = !debug;
+            ts::log::message<1>("Set debug status to ", debug ? "true" : "false");
+            break;
+        }
         default: return Response::none;
     }
 
     if (state.players[0].updated)
     {
+        if (debug)
+            ts::log::message<1>("Local player was updated due to: ", to_string(key), " keypress.");
         client.send(ts::player_update_str + state.players[0].get_string());
+        state.players[0].updated = false;
     }
     return Response::none;
 }

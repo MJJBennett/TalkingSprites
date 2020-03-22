@@ -1,9 +1,7 @@
-#include <array>
-#include <iostream>
 #include "application.hpp"
 
-int main()
+int main(int argc, char* argv[])
 {
     ts::Application app;
-    return app.launch();
+    return app.launch(argc, argv);
 }

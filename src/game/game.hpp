@@ -10,6 +10,8 @@ namespace ts
 {
 class Renderer;
 class GameClient;
+class World;
+struct Config;
 
 class Game
 {
@@ -21,7 +23,7 @@ public:
     };
 
 public:
-    Game(ts::Renderer& r, ts::GameClient& c);
+    Game(ts::Renderer&, ts::GameClient&, ts::World&, ts::Config&);
 
     void render();
     void update();
@@ -29,12 +31,18 @@ public:
     Response handle_keyevent(const sf::Event& e);
 
     void update_player(const std::string& str);
+    void update_world(const std::string& str);
+
+    bool debug{false};
 
 private:
     ts::GameState state;
     ts::TextureHandle default_player{};
+    ts::TextureHandle local_player{};
     ts::Renderer& renderer;
     ts::GameClient& client;
+    ts::World& world;
+    ts::Config& config;
     Keyboard keyboard{"resources/config/keyfile.dump"};
 };
 }  // namespace ts

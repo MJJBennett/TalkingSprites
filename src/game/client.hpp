@@ -10,11 +10,12 @@
 namespace ts
 {
 class Chat;
+struct Config;
 
 class GameClient
 {
 public:
-    GameClient(ts::Chat&);
+    GameClient(ts::Chat&, ts::Config&);
 
     void send_chat(const std::string& message);
 
@@ -27,15 +28,18 @@ public:
     void shutdown()
     {
         client.shutdown();
-        th.join();
+        if (up) th.join();
+        up = false;
     }
 
     std::queue<std::string> game_updates;
 
 private:
     web::Client client;
+    bool up{false};
     std::thread th;
     ts::Chat& chat;
+    ts::Config& config;
 };
 }  // namespace ts
 

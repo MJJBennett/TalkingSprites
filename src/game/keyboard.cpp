@@ -6,9 +6,9 @@
 
 ts::Keyboard::Keyboard(const std::string& file) : filename(file)
 {
-    for (const auto& km : readlines(file))
+    for (const auto& km : readlines(filename))
     {
-        const auto [keyid, keycode] = ts::tools::splitn<2>(km, '=');
+        const auto [keyid, keycode, _comment] = ts::tools::splitn<3>(km, '=');
         if (keyid.size() < 1 || keycode.size() < 1) continue;
         const auto internal_id = ts::tools::stoi(keyid);
         const auto sfml_id     = ts::tools::stoi(keycode);
@@ -18,12 +18,14 @@ ts::Keyboard::Keyboard(const std::string& file) : filename(file)
     }
 
     // Now we have a few necessary defaults
-    default_key(ts::key::close_game, sf::Keyboard::Key::Escape);
     default_key(ts::key::path_down, sf::Keyboard::Key::S);
     default_key(ts::key::path_up, sf::Keyboard::Key::W);
     default_key(ts::key::path_left, sf::Keyboard::Key::A);
     default_key(ts::key::path_right, sf::Keyboard::Key::D);
     default_key(ts::key::rebind_key, sf::Keyboard::Key::P);
+    default_key(ts::key::open_chat, sf::Keyboard::Key::C);
+    default_key(ts::key::close_chat, sf::Keyboard::Key::Escape);
+    default_key(ts::key::toggle_debug, sf::Keyboard::Key::G);
 
     save();
 }
@@ -77,7 +79,7 @@ void ts::Keyboard::save()
     }
     for (const auto& mapping : keymap)
     {
-        ofs << static_cast<int>(mapping.second) << "=" << mapping.first << "\n";
+        ofs << static_cast<int>(mapping.second) << "=" << mapping.first << "=" << to_string(mapping.second) << "\n";
     }
 }
 
