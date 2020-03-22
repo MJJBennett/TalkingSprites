@@ -53,6 +53,7 @@ add_executable(TalkingSprites
     ${CMAKE_SOURCE_DIR}/src/game/client.cpp ${CMAKE_SOURCE_DIR}/src/game/client.hpp
 
     # Main application files
+    ${CMAKE_SOURCE_DIR}/src/config.cpp ${CMAKE_SOURCE_DIR}/src/config.hpp
     ${CMAKE_SOURCE_DIR}/src/application.cpp ${CMAKE_SOURCE_DIR}/src/application.hpp
     ${CMAKE_SOURCE_DIR}/src/main.cpp
 )
