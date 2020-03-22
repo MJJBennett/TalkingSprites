@@ -45,6 +45,14 @@ inline std::vector<std::string> splitv(const std::string& str, const char delim 
     return ret;
 }
 
+// Splits on the delimiter, then removes the first N strings, then returns the remainder as a string
+template <int N>
+auto chop_first(const std::string& str, const char delim = '=') -> std::string
+{
+    const std::array<std::string, N+1> split = ::ts::tools::splitn<N+1>(str, delim);
+    return split[N];
+}
+
 template <int N>
 auto split_get_nth(const std::string& str, const char delim = '=') -> std::string
 {
