@@ -34,6 +34,10 @@ public:
     void update_world(const std::string& str);
 
     bool debug{false};
+    bool focus_chat{true};
+
+    std::function<void()> chat_focus_callback;
+    std::function<void()> chat_close_toggle_callback;
 
 private:
     ts::GameState state;

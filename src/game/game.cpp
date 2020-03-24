@@ -1,17 +1,18 @@
 #include "game.hpp"
 
+#include "config.hpp"
 #include "game/client.hpp"
 #include "game/world.hpp"
 #include "graphics/renderer.hpp"
 #include "tools/debug.hpp"
 #include "tools/string.hpp"
-#include "config.hpp"
 
-ts::Game::Game(ts::Renderer& r, ts::GameClient& c, ts::World& w, ts::Config& config_) : renderer(r), client(c), world(w), config(config_)
+ts::Game::Game(ts::Renderer& r, ts::GameClient& c, ts::World& w, ts::Config& config_)
+    : renderer(r), client(c), world(w), config(config_)
 {
     state.players.emplace_back(config.avatar);
     default_player = renderer.load_texture("resources/sprites/player_01.png");
-    local_player = renderer.load_texture(config.avatar);
+    local_player   = renderer.load_texture(config.avatar);
     state.players[0].set_sprite(renderer.load_sprite(local_player));
 }
 
@@ -31,8 +32,10 @@ void ts::Game::update()
             {
                 state.players[0].id = update.at(ts::username_request_str.size());
                 // Send the player to the remote server to load things properly
-                client.send(ts::player_init_str + config.username + '|' + state.players[0].get_string());
-                ts::log::message<1>("Game: Responding to username request with initialization string.");
+                client.send(ts::player_init_str + config.username + '|' +
+                            state.players[0].get_string());
+                ts::log::message<1>(
+                    "Game: Responding to username request with initialization string.");
                 break;
             }
             case 'S':
@@ -101,7 +104,8 @@ void ts::Game::update_player(const std::string& update_substr)
     ts::log::message<2>("Game: Adding new player: ", update_substr);
     state.players.emplace_back();
     state.players.back().from_string(update_substr);
-    state.players.back().set_sprite(renderer.load_sprite(renderer.load_texture(state.players.back().avatar_str)));
+    state.players.back().set_sprite(
+        renderer.load_sprite(renderer.load_texture(state.players.back().avatar_str)));
     state.players.back().sync(renderer.get_sprite(state.players.back().get_sprite()));
 }
 
@@ -132,8 +136,8 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
             state.players[0].move_left();
             state.players[0].sync(renderer.get_sprite(state.players[0].get_sprite()));
             break;
-        case ts::key::close_chat: break;
-        case ts::key::open_chat: break;
+        case ts::key::focus_chat: chat_focus_callback(); break;
+        case ts::key::toggle_chat: chat_close_toggle_callback(); break;
         case ts::key::toggle_debug:
         {
             debug = !debug;

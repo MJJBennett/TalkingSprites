@@ -9,6 +9,7 @@ ts::Chat::Chat() { std::fill(input_buffer.begin(), input_buffer.end(), '\0'); }
 
 std::optional<std::string> ts::Chat::chat(bool debug)
 {
+    if (!visible) return {};
     ImGui::Begin("Chat", &open, ImGuiWindowFlags_NoResize);
     for (auto&& s : chat_buffer) ImGui::TextUnformatted(s.data());
     ImGui::Text(">");
@@ -21,6 +22,11 @@ std::optional<std::string> ts::Chat::chat(bool debug)
         std::fill(input_buffer.begin(), input_buffer.end(), '\0');
         ImGui::SetScrollY(10000.f);
         new_chat = true;
+    }
+    if (focus_next) 
+    {
+        ImGui::SetKeyboardFocusHere();
+        focus_next = false;
     }
     ImGui::SameLine();
     if (ImGui::Button("Send") && input_buffer[0] != '\0')

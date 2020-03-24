@@ -16,8 +16,8 @@ enum class key
     path_down,
     path_up,
     rebind_key,
-    open_chat,
-    close_chat,
+    focus_chat,
+    toggle_chat,
     toggle_debug,
     unknown,
 };
@@ -32,8 +32,8 @@ inline std::string to_string(const ::ts::key& k)
         case ::ts::key::path_down: return "path_down";
         case ::ts::key::path_up: return "path_up";
         case ::ts::key::rebind_key: return "rebind_key";
-        case ::ts::key::open_chat: return "open_chat";
-        case ::ts::key::close_chat: return "close_chat";
+        case ::ts::key::focus_chat: return "focus_chat";
+        case ::ts::key::toggle_chat: return "toggle_chat";
         case ::ts::key::unknown: return "unknown";
         default: return "unset";
     }

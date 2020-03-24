@@ -14,11 +14,15 @@ public:
     Chat();
     std::optional<std::string> chat(bool debug = false);
     void push(std::string msg) { chat_buffer.emplace_back(std::move(msg)); }
+    void focus() { focus_next = true; }
+    void toggle_visible() { visible = !visible; }
 
 private:
     std::vector<std::string> chat_buffer;
     std::array<char, 128> input_buffer;
     bool open{true};
+    bool focus_next{false};
+    bool visible{true};
 };
 }  // namespace ts
 

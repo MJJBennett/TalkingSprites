@@ -1,12 +1,12 @@
 #include "application.hpp"
 
+#include "config.hpp"
+#include "game/client.hpp"
 #include "game/game.hpp"
 #include "game/world.hpp"
 #include "tools/debug.hpp"
 #include "tools/string.hpp"
 #include "widgets/chat.hpp"
-#include "game/client.hpp"
-#include "config.hpp"
 
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -47,6 +47,9 @@ int ts::Application::launch(int argc, char* argv[])
     ts::GameClient c(chat, config);
     ts::Game game(renderer, c, w, config);
 
+    game.chat_close_toggle_callback = [&chat]() { chat.toggle_visible(); };
+    game.chat_focus_callback        = [&chat]() { chat.focus(); };
+
     while (true)
     {
         sf::Event e;
@@ -82,7 +85,7 @@ int ts::Application::launch(int argc, char* argv[])
             c.send_chat(*cm);
         }
 
-        c.poll(); // Gets web updates
+        c.poll();  // Gets web updates
         game.update();
 
         window.clear();
