@@ -213,7 +213,6 @@ void ts::GameServer::respond_status(web::UserID id)
 
     for (const auto& p : state.players)
     {
-        ts::log::message<1>("ewgaotew: ", p.get_string());
         push(ts::stat_player + p.get_string());
     }
     push(ts::stat_world + world.get_string());
