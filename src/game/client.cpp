@@ -52,15 +52,20 @@ void ts::GameClient::poll()
 void ts::GameClient::send_chat(const std::string& message)
 {
     using namespace ts::tools;
-    if (startswith(message, "/co"))
+    if (startswith(message, "/co")) // /connect
     {
         client.shutdown();
         if (up) th.join();
+        if (const auto url = splitn<2>(lstrip(splitn<2>(message, ' ')[1], ' '), ' '); !url[0].empty())
+        {
+            client.set_url(url[0]); 
+            if (!url[1].empty()) client.set_port(url[1]);
+        }
         th = std::thread{&ts::web::Client::launch, &client};
         up = true;
         return;
     }
-    else if (startswith(message, "/ni"))
+    else if (startswith(message, "/ni")) // /nick
     {
         const auto [cmd, arg] = ts::tools::splitn<2>(message, ' ');
         if (!arg.empty())
@@ -68,7 +73,7 @@ void ts::GameClient::send_chat(const std::string& message)
             config.username = arg;
         }
     }
-    else if (startswith(message, "/pr"))
+    else if (startswith(message, "/pr")) // /profile
     {
         const auto [cmd, args] = ts::tools::splitn<2>(message, ' ');
     }
