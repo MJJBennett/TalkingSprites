@@ -49,7 +49,7 @@ public:
     void unload_area(long x, long y) { world.erase({x, y}); }
 
     std::string get_string() const override;
-    void from_string(std::string str) override;
+    std::string from_string(std::string str) override;
 
     const world_t& get() const { return world; }
 

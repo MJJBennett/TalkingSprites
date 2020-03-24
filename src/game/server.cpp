@@ -43,12 +43,21 @@ void ts::GameServer::on_read(web::UserID id, std::string message)
 
     switch (message[1])
     {
-        case 'U':
+        case 'I':
         {
-            const auto username = message.substr(ts::username_update_str.size());
+            const auto [username, player] =
+                ts::tools::splitn<2>(message.substr(ts::player_init_str.size()), '|');
             ts::log::message<1>("Game Server: Setting username for user id ", id, " to '",
                                 username, "'");
             users.at(id).username = username;
+            // Initialize the player
+            update_player(id, player, true);
+            respond_status(id);
+            break;
+        }
+        case 'U':
+        {
+            server.write({id}, "Warning: Your client is out of date! Update now! (#1)");
             break;
         }
         case 'C':
@@ -80,7 +89,9 @@ void ts::GameServer::on_read(web::UserID id, std::string message)
         case 'S':
         {
             // Client requests [S]tatus, we send [S]tatus back!
-            respond_status(id);
+            // respond_status(id);
+            server.write({id}, "Warning: Your client is out of date! Update now! (#2)");
+            break;
         }
         default: ts::log::warn("Game Server: Ignoring message."); break;
     }
@@ -159,18 +170,22 @@ void ts::GameServer::run_command(web::UserID id, std::string command)
     }
 }
 
-void ts::GameServer::update_player(web::UserID id, std::string str)
+void ts::GameServer::update_player(web::UserID id, std::string str, bool force)
 {
-    const auto pos = users.at(id).pos;
-    auto& player   = state.players[pos];
+    ts::log::message<1>("Game Server: Received player update: ", str);
 
-    const auto [x, y]            = player.get_position();
-    const auto [ignore_id, nxs, nys, other] = ts::tools::splitn<4>(str, '|');
-    const auto nxo               = ts::tools::stoi(nxs);
-    const auto nyo               = ts::tools::stoi(nys);
-    if (!nxo || !nyo) return;  // Failure
-    auto nx = *nxo;
-    auto ny = *nyo;
+    const auto pos = users.at(id).pos;
+    ts::Player& player   = state.players[pos];
+
+    // Previous player data
+    const auto [x, y]  = player.get_position();
+    const auto prev_id = player.id;  // We need to preserve this
+
+    // This is pretty hacky but it's a very quick way to get things running
+    player.from_string(str);
+    player.id           = prev_id;
+    const auto [nx, ny] = player.get_position();
+    player.set_position(x, y);
     if (nx != x || ny != y)
     {
         // Make sure the player isn't cheating!
@@ -179,13 +194,14 @@ void ts::GameServer::update_player(web::UserID id, std::string str)
         // this works this way because of rendering and things
         if (ny < y) player.move_up();
         if (ny > y) player.move_down();
-        const auto [npx, npy] = player.get_position();
-        const auto rxs = std::to_string(npx);
-        const auto rys = std::to_string(npy);
+    }
+    if (player.updated || force)
+    {
         // Now we can send this update back, as we're only parsing positions
         const std::string update_str = ts::player_update_str + player.get_string();
         ts::log::message<1>("Game Server: Sending out update string: ", update_str);
         send_all(update_str);
+        player.updated = false;
     }
 }
 
@@ -193,14 +209,15 @@ void ts::GameServer::respond_status(web::UserID id)
 {
     // This is where things start to get a bit crazy
     std::string resp = ts::status_response_str;
-    auto push = [&resp](std::string str) { resp += std::move(str) + '\n'; };
+    auto push        = [&resp](std::string str) { resp += std::move(str) + '\n'; };
 
     for (const auto& p : state.players)
     {
+        ts::log::message<1>("ewgaotew: ", p.get_string());
         push(ts::stat_player + p.get_string());
     }
     push(ts::stat_world + world.get_string());
-    
+
     server.write({id}, resp);
 }
 

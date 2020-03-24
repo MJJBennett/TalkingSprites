@@ -6,6 +6,7 @@
 namespace ts
 {
 const std::string username_update_str = "[U] Username: ";
+const std::string player_init_str = "[I] (Username | Player): ";
 const std::string username_request_str = "[U] Username Request: ";
 const std::string chat_update_str = "[C] Chat Message: ";
 const std::string player_update_str = "[P] ";

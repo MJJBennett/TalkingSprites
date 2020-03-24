@@ -48,7 +48,7 @@ public:
 
     // Serialization
     std::string get_string() const override;
-    void from_string(std::string) override;
+    std::string from_string(std::string) override;
     virtual ~Character() = default;
 
     char id = ' ';

@@ -27,7 +27,7 @@ public:
     void launch();
 
     void run_command(web::UserID id, std::string command);
-    void update_player(web::UserID id, std::string str);
+    void update_player(web::UserID id, std::string str, bool force = false);
     void respond_status(web::UserID id);
 
 private:

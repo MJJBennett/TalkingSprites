@@ -21,6 +21,8 @@ public:
 
     void send(std::string message) { client.send(std::move(message)); }
 
+    void send_player_init(const std::string& player);
+
     void on_read(std::string message);
 
     void poll();

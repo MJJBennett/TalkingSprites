@@ -31,11 +31,11 @@ std::string ts::World::get_string() const
     return seed_str + sep;
 }
 
-void ts::World::from_string(std::string str)
+std::string ts::World::from_string(std::string str)
 {
     constexpr char sep = '|';
     // Split into values
-    const auto [seed_str, none] = ts::tools::splitn<2>(str, sep);
+    const auto [seed_str, _rem] = ts::tools::splitn<2>(str, sep);
     // Deserialize
     if (const auto seed_opt = ts::tools::stol(seed_str); seed_opt)
     {
@@ -46,4 +46,6 @@ void ts::World::from_string(std::string str)
     {
         v = generate_area(k.first, k.second);
     }
+
+    return _rem;
 }

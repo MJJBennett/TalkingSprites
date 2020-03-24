@@ -19,9 +19,9 @@ void ts::GameClient::on_read(std::string message)
         }
         case 'U':  // Specification: Username request to start connection
         {
-            client.send(ts::username_update_str + config.username);
+            // client.send(ts::username_update_str + config.username);
             game_updates.push(message);
-            client.send(ts::status_request_str);
+            //client.send(ts::status_request_str);
             break;
         }
         default:
