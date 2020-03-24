@@ -9,8 +9,18 @@
 
 namespace ts::tools
 {
+inline auto is_char(char c)
+{
+    return [c](char c_in) { return c == c_in; };
+}
+
+inline std::string lstrip(const std::string& str, const char strip)
+{
+    return {std::find_if_not(str.begin(), str.end(), is_char(strip)), str.end()};
+}
+
 template <int N>
-auto splitn(const std::string& str, const char delim = '=') -> std::array<std::string, N>
+auto splitn(const std::string& str, const char delim) -> std::array<std::string, N>
 {
     std::array<std::string, N> ret;
 
@@ -28,7 +38,7 @@ auto splitn(const std::string& str, const char delim = '=') -> std::array<std::s
     return ret;
 }
 
-inline std::vector<std::string> splitv(const std::string& str, const char delim = '=')
+inline std::vector<std::string> splitv(const std::string& str, const char delim)
 {
     std::vector<std::string> ret;
 
@@ -45,16 +55,17 @@ inline std::vector<std::string> splitv(const std::string& str, const char delim 
     return ret;
 }
 
-// Splits on the delimiter, then removes the first N strings, then returns the remainder as a string
+// Splits on the delimiter, then removes the first N strings, then returns the remainder as a
+// string
 template <int N>
-auto chop_first(const std::string& str, const char delim = '=') -> std::string
+auto chop_first(const std::string& str, const char delim) -> std::string
 {
-    const std::array<std::string, N+1> split = ::ts::tools::splitn<N+1>(str, delim);
+    const std::array<std::string, N + 1> split = ::ts::tools::splitn<N + 1>(str, delim);
     return split[N];
 }
 
 template <int N>
-auto split_get_nth(const std::string& str, const char delim = '=') -> std::string
+auto split_get_nth(const std::string& str, const char delim) -> std::string
 {
     const auto arr = ::ts::tools::splitn<N + 2>(str, delim);
     return arr[N];
@@ -89,6 +100,12 @@ inline bool is_whitespace(const char in) { return in == ' ' || in == '\n' || in 
 // Does a start with b?
 inline bool startswith(const std::string& a, const std::string& b)
 {
+    return a.size() >= b.size() && a.substr(0, b.size()) == b;
+}
+inline bool startswithignore(const std::string& a_in, const std::string& b_in, const char ignore)
+{
+    const auto a = ::ts::tools::lstrip(a_in, ignore);
+    const auto b = ::ts::tools::lstrip(b_in, ignore);
     return a.size() >= b.size() && a.substr(0, b.size()) == b;
 }
 }  // namespace ts::tools

@@ -120,7 +120,7 @@ void ts::Application::configure(std::vector<std::string> args)
 void ts::Application::configure(const std::string& arg)
 {
     using namespace ts::tools;
-    const auto [one, two] = splitn<2>(arg);
+    const auto [one, two] = splitn<2>(arg, '=');
     // Deal with args now
 }
 
