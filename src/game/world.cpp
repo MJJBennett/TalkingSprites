@@ -1,6 +1,7 @@
 #include "world.hpp"
 
 #include "tools/string.hpp"
+#include "tools/debug.hpp"
 
 ts::Area ts::World::generate_area(long x, long y)
 {
@@ -20,6 +21,13 @@ ts::Area ts::World::generate_area(long x, long y)
     }
 
     return a;
+}
+
+void ts::World::load_area(long x, long y)
+{
+    if (world.find({x, y}) != world.end()) return;
+    ts::log::message<1>("World: Loading area at ", x, ", ", y);
+    world.emplace(std::pair{x, y}, generate_area(x, y));
 }
 
 std::string ts::World::get_string() const

@@ -39,13 +39,14 @@ class World : public ::ts::serializable
 public:
     World(long seed_ = 0) : seed(seed_), prng(seed_), distribution(0, 15) {}
 
+    static std::array<long, 2> tile_to_area(long x, long y)
+    {
+        return {x / area_size + (x < 0 ? 0 : -1), y / area_size + (y < 0 ? 0 : -1)};
+    }
+
     /* World generation */
     ts::Area generate_area(long x, long y);
-    void load_area(long x, long y)
-    {
-        if (world.find({x, y}) != world.end()) return;
-        world.emplace(std::pair{x, y}, generate_area(x, y));
-    }
+    void load_area(long x, long y);
     void unload_area(long x, long y) { world.erase({x, y}); }
 
     std::string get_string() const override;

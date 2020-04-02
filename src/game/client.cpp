@@ -65,6 +65,14 @@ void ts::GameClient::send_chat(const std::string& message)
         up = true;
         return;
     }
+    else if (startswith(message, "/tp"))
+    {
+        if (!up)
+        {
+            game_updates.push(message);
+            return;
+        }
+    }
     else if (startswith(message, "/ni")) // /nick
     {
         const auto [cmd, arg] = ts::tools::splitn<2>(message, ' ');

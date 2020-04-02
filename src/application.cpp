@@ -30,28 +30,38 @@ int ts::Application::launch(int argc, char* argv[])
     //   renderer.load_sprite(grass_text);
     renderer.load_tile(grass_text);
     renderer.load_tile(renderer.load_texture("resources/sprites/rocks_0.png"));
-    World w;
-    w.load_area(0, 0);
-    w.load_area(1, 1);
-    w.load_area(1, 0);
-    w.load_area(0, 1);
-    w.load_area(2, 2);
-    w.load_area(2, 1);
-    w.load_area(1, 2);
-    w.load_area(0, 2);
-    w.load_area(2, 0);
+    World world;
+    world.load_area(0, 0);
+    world.load_area(1, 1);
+    world.load_area(1, 0);
+    world.load_area(0, 1);
+    world.load_area(2, 2);
+    world.load_area(2, 1);
+    world.load_area(1, 2);
+    world.load_area(0, 2);
+    world.load_area(2, 0);
     start_imgui(window);
 
     ts::Chat chat;
 
     ts::GameClient c(chat, config);
-    ts::Game game(renderer, c, w, config);
+    ts::Game game(renderer, c, world, config);
 
     game.chat_close_toggle_callback = [&chat]() { chat.toggle_visible(); };
     game.chat_focus_callback        = [&chat]() { chat.focus(); };
 
+    sf::View world_view = window.getDefaultView();
+    //const auto area_load_radius = 1; // It's still a prototype, so this is (okay?)
+    auto [prev_x, prev_y] = game.get_player_position();
+    world_view.setCenter(prev_x, prev_y);
+    window.setView(world_view);
+
     while (true)
     {
+        /**
+         * Event management
+         */
+
         sf::Event e;
         while (window.pollEvent(e))
         {
@@ -78,6 +88,10 @@ int ts::Application::launch(int argc, char* argv[])
         }
         if (!window.isOpen()) break;
 
+        /**
+         * Priority updates
+         */
+
         isf::Update(window, delta.restart());
 
         if (auto cm = chat.chat(game.debug); cm)
@@ -85,21 +99,33 @@ int ts::Application::launch(int argc, char* argv[])
             c.send_chat(*cm);
         }
 
+        /**
+         * Game updates
+         */
+
         c.poll();  // Gets web updates
         game.update();
 
+        const auto [ptx, pty] = game.get_player_tile();
+        const auto [pax, pay] = world.tile_to_area(ptx, pty);
+        world.load_area(pax, pay);
+
+        // Clear window prior to render
         window.clear();
-        // for (int x = 0; x < 10; x++)
-        //{
-        //   for (int y = 0; y < 10; y++)
-        //  {
-        //     renderer.get_sprite(grass_id).setPosition(x * 32, y * 32);
-        //    renderer.render(grass_id);
-        //}
-        //}
-        renderer.render(w);
-        game.render();
+
+        /**
+         * Rendering
+         */
+       
+        if (const auto [pxp, pyp] = game.get_player_position(); pxp != prev_x || pyp != prev_y)
+        {
+            world_view.setCenter(pxp, pyp);
+            window.setView(world_view);
+        }
+        renderer.render(world); // Render the world
+        game.render(); // Render the game
         isf::Render(window);  // Render ImGui last
+
         window.display();
     }
 

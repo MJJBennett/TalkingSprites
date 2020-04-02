@@ -21,6 +21,12 @@ void ts::Game::update()
     while (!client.game_updates.empty())
     {
         const auto update = client.game_updates.back();
+        if (update[0] == '/') 
+        {
+            handle_command(update);
+            client.game_updates.pop();
+            continue;
+        }
         switch (update[1])
         {
             case 'P':
@@ -107,6 +113,31 @@ void ts::Game::update_player(const std::string& update_substr)
     state.players.back().set_sprite(
         renderer.load_sprite(renderer.load_texture(state.players.back().avatar_str)));
     state.players.back().sync(renderer.get_sprite(state.players.back().get_sprite()));
+}
+
+std::array<long, 2> ts::Game::get_player_tile() { return state.players[0].get_tile(); }
+
+std::array<long, 2> ts::Game::get_player_position()
+{
+    auto [ix, iy] = state.players[0].get_position();
+    return {long(ix), long(iy)};
+}
+
+void ts::Game::handle_command(const std::string& cmd)
+{
+    using namespace ts::tools;
+    const auto [command, args] = splitn<2>(cmd, ' ');
+
+    if (startswith(command, "/tp"))
+    {
+        // We only receive this command in offline mode,
+        // so we're okayed to just move the player.
+        if (const auto [x, y] = all_stol<2>(splitn<2>(args, ' ')); !!x && !!y)
+        {
+            state.players[0].set_tile_position(*x, *y);
+        }
+        return;
+    }
 }
 
 ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)

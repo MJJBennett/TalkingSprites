@@ -95,6 +95,17 @@ inline std::optional<int> stoi(const std::string& s)
     }
 }
 
+template <int N>
+auto all_stol(std::array<std::string, N> strs) -> std::array<std::optional<long>, N>
+{
+    std::array<std::optional<long>, N> r;
+    for (int i = 0; i < N; i++)
+    {
+        r[i] = ::ts::tools::stol(strs[i]);
+    }
+    return r;
+}
+
 inline bool is_whitespace(const char in) { return in == ' ' || in == '\n' || in == '\r'; }
 
 // Does a start with b?

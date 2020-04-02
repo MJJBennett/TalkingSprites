@@ -19,7 +19,13 @@ public:
         y       = y_;
         updated = true;
     }
+    void set_tile_position(int x_, int y_)
+    {
+        x = move_delta * x_;
+        y = move_delta * y_;
+    }
     std::array<int, 2> get_position() const { return {x, y}; }
+    std::array<long, 2> get_tile() const { return {x / move_delta, y / move_delta}; }
     void move_left()
     {
         x -= move_delta;

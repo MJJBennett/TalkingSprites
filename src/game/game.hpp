@@ -29,12 +29,16 @@ public:
     void update();
 
     Response handle_keyevent(const sf::Event& e);
+    void handle_command(const std::string& cmd);
 
     void update_player(const std::string& str);
     void update_world(const std::string& str);
 
     bool debug{false};
     bool focus_chat{true};
+
+    std::array<long, 2> get_player_tile();
+    std::array<long, 2> get_player_position();
 
     std::function<void()> chat_focus_callback;
     std::function<void()> chat_close_toggle_callback;
