@@ -26,6 +26,7 @@ ts::Keyboard::Keyboard(const std::string& file) : filename(file)
     default_key(ts::key::focus_chat, sf::Keyboard::Key::Enter);
     default_key(ts::key::toggle_chat, sf::Keyboard::Key::Tab);
     default_key(ts::key::toggle_debug, sf::Keyboard::Key::G);
+    default_key(ts::key::print_debug, sf::Keyboard::Key::Y);
 
     save();
 }

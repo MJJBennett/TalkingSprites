@@ -3,6 +3,7 @@
 
 #include "fwd/sfml.hpp"
 #include "graphics/resource.hpp"
+#include "tools/numbers.hpp"
 #include "tools/serializable.hpp"
 
 #include <array>

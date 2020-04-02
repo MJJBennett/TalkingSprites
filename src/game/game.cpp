@@ -172,8 +172,17 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
         case ts::key::toggle_debug:
         {
             debug = !debug;
-            ts::log::message<1>("Set debug status to ", debug ? "true" : "false");
+            ts::log::message<1>("Game: Set debug status to ", debug ? "true" : "false");
             break;
+        }
+        case ts::key::print_debug:
+        {
+            const auto [px, py] = get_player_position();
+            ts::log::message<10>("Game => Debug information: ", "\n\tPlayer Position: ", px, ", ", py);
+            const auto [ptx, pty] = get_player_tile();
+            ts::log::message<10>("\tPlayer Tile: ", ptx, ", ", pty);
+            const auto [pax, pay] = ts::World::tile_to_area(ptx, pty);
+            ts::log::message<10>("\tPlayer Area: ", pax, ", ", pay);
         }
         default: return Response::none;
     }

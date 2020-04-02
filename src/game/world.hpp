@@ -3,6 +3,7 @@
 
 #include "tile.hpp"
 #include "tools/serializable.hpp"
+#include "tools/numbers.hpp"
 
 #include <array>
 #include <random>
@@ -41,7 +42,7 @@ public:
 
     static std::array<long, 2> tile_to_area(long x, long y)
     {
-        return {x / area_size + (x < 0 ? 0 : -1), y / area_size + (y < 0 ? 0 : -1)};
+        return ts::tools::coordinate_div(x, y, area_size);
     }
 
     /* World generation */
