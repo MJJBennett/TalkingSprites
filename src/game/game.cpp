@@ -135,8 +135,13 @@ void ts::Game::handle_command(const std::string& cmd)
         if (const auto [x, y] = all_stol<2>(splitn<2>(args, ' ')); !!x && !!y)
         {
             state.players[0].set_tile_position(*x, *y);
+            state.players[0].sync(renderer.get_sprite(state.players[0].get_sprite()));
         }
         return;
+    }
+    if (startswith(command, "/seed"))
+    {
+        client.chat_local("[Game] Local Seed: " + std::to_string(world.get_seed()));
     }
 }
 
@@ -183,6 +188,7 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
             ts::log::message<10>("\tPlayer Tile: ", ptx, ", ", pty);
             const auto [pax, pay] = ts::World::tile_to_area(ptx, pty);
             ts::log::message<10>("\tPlayer Area: ", pax, ", ", pay);
+            world.print_debug();
         }
         default: return Response::none;
     }

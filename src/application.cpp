@@ -25,21 +25,12 @@ int ts::Application::launch(int argc, char* argv[])
     sf::RenderWindow window(sf::VideoMode(800, 600), config.name);
     window.setFramerateLimit(120);
     ts::Renderer renderer(window);
-    const auto grass_text = renderer.load_texture("resources/sprites/grass_0.png");
-    // const auto grass_id =
-    //   renderer.load_sprite(grass_text);
-    renderer.load_tile(grass_text);
+    renderer.load_tile(renderer.load_texture("resources/sprites/grass_0.png"));
     renderer.load_tile(renderer.load_texture("resources/sprites/rocks_0.png"));
+    renderer.load_tile(renderer.load_texture("resources/sprites/Cave_01.png"));
     World world;
-    world.load_area(0, 0);
-    world.load_area(1, 1);
-    world.load_area(1, 0);
-    world.load_area(0, 1);
-    world.load_area(2, 2);
-    world.load_area(2, 1);
-    world.load_area(1, 2);
-    world.load_area(0, 2);
-    world.load_area(2, 0);
+    // Load initial regions
+    for (int xi = -1; xi < 2; xi++) for (int yi = -1; yi < 2; yi++) world.load_area(xi, yi);
     start_imgui(window);
 
     ts::Chat chat;
@@ -55,6 +46,9 @@ int ts::Application::launch(int argc, char* argv[])
     auto [prev_x, prev_y] = game.get_player_position();
     world_view.setCenter(prev_x, prev_y);
     window.setView(world_view);
+
+    size_t tick_counter = 0;
+    size_t rare_tick = 128;
 
     while (true)
     {
@@ -108,10 +102,18 @@ int ts::Application::launch(int argc, char* argv[])
 
         const auto [ptx, pty] = game.get_player_tile();
         const auto [pax, pay] = world.tile_to_area(ptx, pty);
-        world.load_area(pax, pay);
+        if (--rare_tick == 0) 
+        {
+            world.unload_areas(pax, pay);
+            rare_tick = 128;
+        }
+        if (tick_counter % 8 == 0) 
+        {
+            for (int xi = -2; xi < 3; xi++) for (int yi = -2; yi < 3; yi++) world.load_area(pax + xi, pay + yi);
+        }
 
         // Clear window prior to render
-        window.clear();
+        window.clear(sf::Color(83, 159, 28));
 
         /**
          * Rendering
@@ -121,12 +123,17 @@ int ts::Application::launch(int argc, char* argv[])
         {
             world_view.setCenter(pxp, pyp);
             window.setView(world_view);
+            prev_x = pxp;
+            prev_y = pyp;
         }
         renderer.render(world); // Render the world
         game.render(); // Render the game
         isf::Render(window);  // Render ImGui last
 
         window.display();
+
+        // Increment tick counter
+        tick_counter++;
     }
 
     ts::log::message<1>("Application: Shutting down web client.");

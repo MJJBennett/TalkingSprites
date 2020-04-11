@@ -38,7 +38,7 @@ using world_t = std::unordered_map<area_pos_t, Area, AreaPositionHash>;
 class World : public ::ts::serializable
 {
 public:
-    World(long seed_ = 0) : seed(seed_), prng(seed_), distribution(0, 15) {}
+    World(long seed_ = 0) : seed(seed_), prng(seed_), distribution(0, 15), rare_distribution(0, 100) {}
 
     static std::array<long, 2> tile_to_area(long x, long y)
     {
@@ -49,17 +49,23 @@ public:
     ts::Area generate_area(long x, long y);
     void load_area(long x, long y);
     void unload_area(long x, long y) { world.erase({x, y}); }
+    void unload_areas(long x, long y);
 
     std::string get_string() const override;
     std::string from_string(std::string str) override;
 
     const world_t& get() const { return world; }
 
+    void print_debug() const;
+
+    long get_seed() const { return seed; }
+
 private:
     world_t world;
     long seed;
     std::mt19937 prng;
     std::uniform_int_distribution<int> distribution;
+    std::uniform_int_distribution<int> rare_distribution;
 };
 }  // namespace ts
 

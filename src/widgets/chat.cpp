@@ -11,7 +11,7 @@ std::optional<std::string> ts::Chat::chat(bool debug)
 {
     if (!visible) return {};
     ImGui::Begin("Chat", &open, ImGuiWindowFlags_NoResize);
-    for (auto&& s : chat_buffer) ImGui::TextUnformatted(s.data());
+    for (auto&& s : chat_buffer) ImGui::TextWrapped("%s", s.c_str());
     ImGui::Text(">");
     ImGui::SameLine();
     bool new_chat{false};

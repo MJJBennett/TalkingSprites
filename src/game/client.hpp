@@ -18,6 +18,7 @@ public:
     GameClient(ts::Chat&, ts::Config&);
 
     void send_chat(const std::string& message);
+    void chat_local(const std::string& message);
 
     void send(std::string message) { client.send(std::move(message)); }
 

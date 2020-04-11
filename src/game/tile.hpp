@@ -8,7 +8,8 @@ struct Tile
     enum class Type
     {
         grass = 0,
-        rock
+        rock,
+        cave
     } type = Type::grass;
 };
 }  // namespace ts
