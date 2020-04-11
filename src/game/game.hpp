@@ -40,7 +40,7 @@ public:
     std::array<long, 2> get_player_tile();
     std::array<long, 2> get_player_position();
 
-    std::function<void()> chat_focus_callback;
+    std::function<void(const std::string&)> chat_focus_callback;
     std::function<void()> chat_close_toggle_callback;
 
 private:

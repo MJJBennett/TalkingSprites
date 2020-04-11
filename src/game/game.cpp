@@ -172,7 +172,7 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
             state.players[0].move_left();
             state.players[0].sync(renderer.get_sprite(state.players[0].get_sprite()));
             break;
-        case ts::key::focus_chat: chat_focus_callback(); break;
+        case ts::key::focus_chat: chat_focus_callback(""); break;
         case ts::key::toggle_chat: chat_close_toggle_callback(); break;
         case ts::key::toggle_debug:
         {
@@ -189,6 +189,10 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
             const auto [pax, pay] = ts::World::tile_to_area(ptx, pty);
             ts::log::message<10>("\tPlayer Area: ", pax, ", ", pay);
             world.print_debug();
+        }
+        case ts::key::start_command:
+        {
+            chat_focus_callback("/");
         }
         default: return Response::none;
     }

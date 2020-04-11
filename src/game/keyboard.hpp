@@ -20,6 +20,7 @@ enum class key
     toggle_chat,
     toggle_debug,
     print_debug,
+    start_command,
     unknown,
 };
 
@@ -36,6 +37,8 @@ inline std::string to_string(const ::ts::key& k)
         case ::ts::key::focus_chat: return "focus_chat";
         case ::ts::key::toggle_chat: return "toggle_chat";
         case ::ts::key::print_debug: return "print_debug";
+        case ::ts::key::toggle_debug: return "toggle_debug";
+        case ::ts::key::start_command: return "start_command";
         case ::ts::key::unknown: return "unknown";
         default: return "unset";
     }

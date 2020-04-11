@@ -14,7 +14,7 @@ public:
     Chat();
     std::optional<std::string> chat(bool debug = false);
     void push(std::string msg) { chat_buffer.emplace_back(std::move(msg)); }
-    void focus() { focus_next = true; }
+    void focus(const std::string& str) { focus_str = str; focus_next = true; }
     void toggle_visible() { visible = !visible; }
 
 private:
@@ -22,6 +22,7 @@ private:
     std::array<char, 128> input_buffer;
     bool open{true};
     bool focus_next{false};
+    std::string focus_str{};
     bool visible{true};
 };
 }  // namespace ts

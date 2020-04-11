@@ -39,7 +39,7 @@ int ts::Application::launch(int argc, char* argv[])
     ts::Game game(renderer, c, world, config);
 
     game.chat_close_toggle_callback = [&chat]() { chat.toggle_visible(); };
-    game.chat_focus_callback        = [&chat]() { chat.focus(); };
+    game.chat_focus_callback        = [&chat](const std::string& s) { chat.focus(s); };
 
     sf::View world_view = window.getDefaultView();
     //const auto area_load_radius = 1; // It's still a prototype, so this is (okay?)
