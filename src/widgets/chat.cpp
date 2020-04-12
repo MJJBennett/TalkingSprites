@@ -28,6 +28,7 @@ std::optional<std::string> ts::Chat::chat(bool debug)
         if (input_buffer[0] == '\0')
         {
             std::copy(focus_str.begin(), focus_str.end(), input_buffer.begin());
+            focus_str.clear();
         }
         ImGui::SetKeyboardFocusHere();
         focus_next = false;
