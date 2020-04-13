@@ -21,7 +21,7 @@ void ts::Game::update()
     while (!client.game_updates.empty())
     {
         const auto update = client.game_updates.back();
-        if (update[0] == '/') 
+        if (update[0] == '/')
         {
             handle_command(update);
             client.game_updates.pop();
@@ -117,6 +117,11 @@ void ts::Game::update_player(const std::string& update_substr)
 
 std::array<long, 2> ts::Game::get_player_tile() { return state.players[0].get_tile(); }
 
+ts::Tile::Type ts::Game::get_player_tile_type()
+{
+    return world.tile_type_at(get_player().get_tile());
+}
+
 std::array<long, 2> ts::Game::get_player_position()
 {
     auto [ix, iy] = state.players[0].get_position();
@@ -196,19 +201,22 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
         case ts::key::print_debug:
         {
             const auto [px, py] = get_player_position();
-            ts::log::message<10>("Game => Debug information: ", "\n\tPlayer Position: ", px, ", ", py);
+            ts::log::message<10>("Game => Debug information: ", "\n\tPlayer Position: ", px, ", ",
+                                 py);
             const auto [ptx, pty] = get_player_tile();
             ts::log::message<10>("\tPlayer Tile: ", ptx, ", ", pty);
+            ts::log::message<10>("\t-> Type: ", ts::to_string(get_player_tile_type()));
             const auto [pax, pay] = ts::World::tile_to_area(ptx, pty);
             ts::log::message<10>("\tPlayer Area: ", pax, ", ", pay);
-            ts::log::message<10>("\tPlayer Balance: ", get_player().balance); 
-            ts::log::message<10>("\tPlayer Avatar: ", get_player().avatar_str); 
+            ts::log::message<10>("\tPlayer Balance: ", get_player().balance);
+            ts::log::message<10>("\tPlayer Avatar: ", get_player().avatar_str);
             world.print_debug();
             break;
         }
         case ts::key::start_command:
         {
             chat_focus_callback("/");
+            break;
         }
         default: return Response::none;
     }
@@ -216,10 +224,11 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
     if (state.players[0].updated)
     {
         if (debug)
-            ts::log::message<1>("Local player was updated due to: ", to_string(key), " keypress.");
-        if (world.tile_type_at(get_player().get_tile()) == ts::Tile::Type::cave)
+            ts::log::message<1>("[Game] Local player was updated due to: ", to_string(key), " keypress.");
+        if (get_player_tile_type() == ts::Tile::Type::cave)
         {
-            get_player().balance += 1; // rich get richer
+            ts::log::message<1>("[Game] Player's balance rose!");
+            get_player().balance += 1;  // rich get richer
         }
         client.send(ts::player_update_str + state.players[0].get_string());
         state.players[0].updated = false;

@@ -45,6 +45,7 @@ public:
 
 private:
     ts::Player& get_player() { return state.players[0]; }
+    ts::Tile::Type get_player_tile_type();
 
 private:
     ts::GameState state;
