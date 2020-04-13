@@ -144,6 +144,15 @@ void ts::Game::handle_command(const std::string& cmd)
         }
         return;
     }
+    if (startswith(command, "/bal"))
+    {
+        const auto [arg, val] = splitn<2>(args, ' ');
+        if (const auto iv = ts::tools::stol(val); iv)
+        {
+            if (arg == "set") get_player().balance = *iv; 
+            if (arg == "add") get_player().balance += *iv; 
+        }
+    }
     if (startswith(command, "/seed"))
     {
         // We only receive this command in offline mode,
@@ -229,6 +238,7 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
         {
             ts::log::message<1>("[Game] Player's balance rose!");
             get_player().balance += 1;  // rich get richer
+            balance.set(get_player().balance);
         }
         client.send(ts::player_update_str + state.players[0].get_string());
         state.players[0].updated = false;
@@ -242,4 +252,9 @@ void ts::Game::render()
     {
         renderer.render(p.get_sprite());
     }
+}
+
+void ts::Game::draw_widgets()
+{
+    balance.draw(); 
 }

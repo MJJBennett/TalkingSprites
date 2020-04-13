@@ -76,6 +76,14 @@ void ts::GameClient::send_chat(const std::string& message)
             return;
         }
     }
+    else if (startswith(message, "/bal")) // /balance
+    {
+        if (!up)
+        {
+            game_updates.push(message);
+            return;
+        }
+    }
     else if (startswith(message, "/seed"))
     {
         if (!up)

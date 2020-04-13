@@ -3,6 +3,7 @@
 
 #include "game/keyboard.hpp"
 #include "game/state.hpp"
+#include "widgets/balance.hpp"
 
 #include <SFML/Window/Event.hpp>
 
@@ -27,6 +28,7 @@ public:
 
     void render();
     void update();
+    void draw_widgets(); // widgets only
 
     Response handle_keyevent(const sf::Event& e);
     void handle_command(const std::string& cmd);
@@ -56,6 +58,7 @@ private:
     ts::World& world;
     ts::Config& config;
     Keyboard keyboard{"resources/config/keyfile.dump"};
+    Balance balance;
 };
 }  // namespace ts
 

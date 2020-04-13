@@ -93,6 +93,8 @@ int ts::Application::launch(int argc, char* argv[])
             c.send_chat(*cm);
         }
 
+        game.draw_widgets();
+
         /**
          * Game updates
          */

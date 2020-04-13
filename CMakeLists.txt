@@ -45,7 +45,9 @@ add_executable(TalkingSprites
     ${CMAKE_SOURCE_DIR}/src/graphics/renderer.cpp ${CMAKE_SOURCE_DIR}/src/graphics/renderer.hpp
 
     # Widget / Window files
+    ${CMAKE_SOURCE_DIR}/src/widgets/widget.hpp
     ${CMAKE_SOURCE_DIR}/src/widgets/chat.cpp ${CMAKE_SOURCE_DIR}/src/widgets/chat.hpp
+    ${CMAKE_SOURCE_DIR}/src/widgets/balance.cpp ${CMAKE_SOURCE_DIR}/src/widgets/balance.hpp
 
     # Web resource files
     ${CMAKE_SOURCE_DIR}/src/web/user.cpp ${CMAKE_SOURCE_DIR}/src/web/user.hpp
