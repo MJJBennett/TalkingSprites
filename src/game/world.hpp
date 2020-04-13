@@ -62,7 +62,7 @@ public:
             const auto [ix, iy] = tile_mod(tx, ty);
             return it->second[ix][iy].type;
         }
-        return ts::Tile::Type::grass;
+        return ts::Tile::Type::unloaded;
     }
 
     /* World generation */
