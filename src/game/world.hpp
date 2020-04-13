@@ -59,6 +59,7 @@ public:
     void print_debug() const;
 
     long get_seed() const { return seed; }
+    void set_seed(long _seed) { seed = _seed; world.clear(); }
 
 private:
     world_t world;

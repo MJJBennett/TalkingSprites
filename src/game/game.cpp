@@ -141,7 +141,20 @@ void ts::Game::handle_command(const std::string& cmd)
     }
     if (startswith(command, "/seed"))
     {
-        client.chat_local("[Game] Local Seed: " + std::to_string(world.get_seed()));
+        // We only receive this command in offline mode,
+        // so we're okayed to set the seed if we need to.
+        if (startswith(args, "set"))
+        {
+            const auto new_seed = ts::tools::stol(chop_first<1>(args, ' '));
+            if (new_seed)
+            {
+                world.set_seed(*new_seed);
+            }
+        }
+        else
+        {
+            client.chat_local("[Game] Local Seed: " + std::to_string(world.get_seed()));
+        }
     }
 }
 

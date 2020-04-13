@@ -159,15 +159,43 @@ void ts::GameServer::run_command(web::UserID id, std::string command)
 
     // Cannot be executed without permissions
     if (!user_itr->second.op) return;
+    if (startswith(command, "/seed"))
+    {
+        if (startswith(command, "/seed set"))
+        {
+            const auto new_seed = ts::tools::stol(chop_first<2>(command, ' '));
+            if (new_seed)
+            {
+                world.set_seed(*new_seed);
+                update_world();
+            }
+        }
+        else
+        {
+            server.write({id}, ts::chat_update_str + "Seed: " + std::to_string(world.get_seed()));
+        }
+        return;
+    }
+    if (startswith(command, "/tp"))
+    {
+        server.write({id}, "/tp is not enabled on this server.");
+    }
     if (startswith(command, "/stop"))
     {
         send_all(ts::chat_update_str + "Server: Shutting down.");
         server.shutdown();
+        return;
     }
     if (startswith(command, "/say"))
     {
         send_all(ts::chat_update_str + "Server: " + splitn<2>(command, ' ')[1]);
+        return;
     }
+}
+
+void ts::GameServer::update_world() 
+{
+    send_all(construct_status());    
 }
 
 void ts::GameServer::update_player(web::UserID id, std::string str, bool force)
@@ -205,7 +233,7 @@ void ts::GameServer::update_player(web::UserID id, std::string str, bool force)
     }
 }
 
-void ts::GameServer::respond_status(web::UserID id)
+std::string ts::GameServer::construct_status() const
 {
     // This is where things start to get a bit crazy
     std::string resp = ts::status_response_str;
@@ -216,8 +244,12 @@ void ts::GameServer::respond_status(web::UserID id)
         push(ts::stat_player + p.get_string());
     }
     push(ts::stat_world + world.get_string());
+    return resp;
+}
 
-    server.write({id}, resp);
+void ts::GameServer::respond_status(web::UserID id)
+{
+    server.write({id}, construct_status());
 }
 
 /**
