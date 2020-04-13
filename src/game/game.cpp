@@ -201,7 +201,10 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
             ts::log::message<10>("\tPlayer Tile: ", ptx, ", ", pty);
             const auto [pax, pay] = ts::World::tile_to_area(ptx, pty);
             ts::log::message<10>("\tPlayer Area: ", pax, ", ", pay);
+            ts::log::message<10>("\tPlayer Balance: ", get_player().balance); 
+            ts::log::message<10>("\tPlayer Avatar: ", get_player().avatar_str); 
             world.print_debug();
+            break;
         }
         case ts::key::start_command:
         {
@@ -214,6 +217,10 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
     {
         if (debug)
             ts::log::message<1>("Local player was updated due to: ", to_string(key), " keypress.");
+        if (world.tile_type_at(get_player().get_tile()) == ts::Tile::Type::cave)
+        {
+            get_player().balance += 1; // rich get richer
+        }
         client.send(ts::player_update_str + state.players[0].get_string());
         state.players[0].updated = false;
     }

@@ -45,6 +45,26 @@ public:
         return ts::tools::coordinate_div(x, y, area_size);
     }
 
+    static std::array<long, 2> tile_mod(long x, long y)
+    {
+        x %= area_size;
+        y %= area_size;
+        return {x, y};
+    }
+
+    // Expects tile coordinates
+    ts::Tile::Type tile_type_at(std::array<long, 2> arr) const
+    {
+        const auto [tx, ty] = arr; 
+        const auto [ax, ay] = tile_to_area(tx, ty); 
+        if (const auto it = world.find({ax, ay}); it != world.end())
+        {
+            const auto [ix, iy] = tile_mod(tx, ty);
+            return it->second[ix][iy].type;
+        }
+        return ts::Tile::Type::grass;
+    }
+
     /* World generation */
     ts::Area generate_area(long x, long y);
     void load_area(long x, long y);

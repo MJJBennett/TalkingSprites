@@ -44,6 +44,9 @@ public:
     std::function<void()> chat_close_toggle_callback;
 
 private:
+    ts::Player& get_player() { return state.players[0]; }
+
+private:
     ts::GameState state;
     ts::TextureHandle default_player{};
     ts::TextureHandle local_player{};

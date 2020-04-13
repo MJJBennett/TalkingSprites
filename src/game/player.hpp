@@ -18,6 +18,8 @@ public:
     std::string avatar_str;
 
     static Player make_from_string(std::string);
+
+    long balance{0};
 };
 }  // namespace ts
 
