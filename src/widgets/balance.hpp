@@ -11,7 +11,7 @@ class Balance : public ts::WidgetBase
 {
 public:
     void set(long bal) { balance = "Balance: " + std::to_string(bal); }
-    void draw(bool debug = false);
+    void draw_self(bool debug = false) override;
 
 private:
     std::string balance{"Balance: 0"};

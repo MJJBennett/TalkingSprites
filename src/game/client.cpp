@@ -98,6 +98,7 @@ void ts::GameClient::send_chat(const std::string& message)
         if (!arg.empty())
         {
             config.username = arg;
+            //game_updates.push(message);
         }
     }
     else if (startswith(message, "/pr"))  // /profile

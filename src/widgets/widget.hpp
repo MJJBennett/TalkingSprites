@@ -9,6 +9,8 @@ class WidgetBase
 {
 public:
     void toggle_visible() { visible = !visible; }
+    void draw(bool debug = false) { if (visible) draw_self(debug); }
+    virtual void draw_self(bool) = 0;
 
 protected:
     bool visible{true};

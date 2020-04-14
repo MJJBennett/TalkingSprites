@@ -11,9 +11,11 @@ ts::Game::Game(ts::Renderer& r, ts::GameClient& c, ts::World& w, ts::Config& con
     : renderer(r), client(c), world(w), config(config_)
 {
     state.players.emplace_back(config.avatar);
-    default_player = renderer.load_texture("resources/sprites/player_01.png");
-    local_player   = renderer.load_texture(config.avatar);
+    state.players.back().username = config.username;  // simple fix
+    default_player                = renderer.load_texture("resources/sprites/player_01.png");
+    local_player                  = renderer.load_texture(config.avatar);
     state.players[0].set_sprite(renderer.load_sprite(local_player));
+    challenge.challenge_callback = [this](const std::string& str) { run_challenge(str); };
 }
 
 void ts::Game::update()
@@ -70,6 +72,36 @@ void ts::Game::update()
                 ts::log::message<1>("-> Completed status updates.");
                 break;
             }
+            case 'L':
+            {
+                // Should be challenge completion!
+                const auto [stat, enemy] = ts::tools::splitn<2>(update.substr(ts::challenge_str.size()), '|');
+                size_t i = 1;
+                for (; i < state.players.size(); i++)
+                {
+                    if (state.players[i].username == enemy)
+                    {
+                        break;
+                    }
+                }
+                if (stat == "tie")
+                {
+                    client.chat_local("Your match against " + enemy + " ended in a draw.");
+                }
+                if (stat == "lose")
+                {
+                    client.chat_local("Your match against " + enemy + " ended in a loss :(");
+                    state.players[i].balance += get_player().balance;
+                    get_player().balance = 0;
+                }
+                if (stat == "win")
+                {
+                    client.chat_local("Your match against " + enemy + " ended in a win!");
+                    get_player().balance += state.players[i].balance;
+                    state.players[i].balance = 0;
+                }
+                challenge.reset();
+            }
             default:
             {
                 ts::log::warn("Game: Ignored update:\n", update);
@@ -113,6 +145,7 @@ void ts::Game::update_player(const std::string& update_substr)
     state.players.back().set_sprite(
         renderer.load_sprite(renderer.load_texture(state.players.back().avatar_str)));
     state.players.back().sync(renderer.get_sprite(state.players.back().get_sprite()));
+    challenge.update(state);
 }
 
 std::array<long, 2> ts::Game::get_player_tile() { return state.players[0].get_tile(); }
@@ -149,8 +182,8 @@ void ts::Game::handle_command(const std::string& cmd)
         const auto [arg, val] = splitn<2>(args, ' ');
         if (const auto iv = ts::tools::stol(val); iv)
         {
-            if (arg == "set") get_player().balance = *iv; 
-            if (arg == "add") get_player().balance += *iv; 
+            if (arg == "set") get_player().balance = *iv;
+            if (arg == "add") get_player().balance += *iv;
         }
     }
     if (startswith(command, "/seed"))
@@ -219,6 +252,8 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
             ts::log::message<10>("\tPlayer Area: ", pax, ", ", pay);
             ts::log::message<10>("\tPlayer Balance: ", get_player().balance);
             ts::log::message<10>("\tPlayer Avatar: ", get_player().avatar_str);
+            ts::log::message<10>("Players Online:");
+            for (const auto& p : state.players) ts::log::message<10>("\t- ", p.username);
             world.print_debug();
             break;
         }
@@ -233,17 +268,28 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
     if (state.players[0].updated)
     {
         if (debug)
-            ts::log::message<1>("[Game] Local player was updated due to: ", to_string(key), " keypress.");
+            ts::log::message<1>("[Game] Local player was updated due to: ", to_string(key),
+                                " keypress.");
         if (get_player_tile_type() == ts::Tile::Type::cave)
         {
             ts::log::message<1>("[Game] Player's balance rose!");
             get_player().balance += 1;  // rich get richer
             balance.set(get_player().balance);
         }
+        challenge.update(state);
+        if (challenge.to_challenge)
+        {
+            client.send(ts::challenge_str + "start" + '|' + *challenge.to_challenge);
+        }
         client.send(ts::player_update_str + state.players[0].get_string());
         state.players[0].updated = false;
     }
     return Response::none;
+}
+
+void ts::Game::run_challenge(const std::string& username)
+{
+    client.chat_local("Starting challenge of " + username);
 }
 
 void ts::Game::render()
@@ -256,5 +302,6 @@ void ts::Game::render()
 
 void ts::Game::draw_widgets()
 {
-    balance.draw(); 
+    balance.draw();
+    challenge.draw();
 }

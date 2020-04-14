@@ -4,6 +4,7 @@
 #include "game/keyboard.hpp"
 #include "game/state.hpp"
 #include "widgets/balance.hpp"
+#include "widgets/challenge.hpp"
 
 #include <SFML/Window/Event.hpp>
 
@@ -32,6 +33,7 @@ public:
 
     Response handle_keyevent(const sf::Event& e);
     void handle_command(const std::string& cmd);
+    void run_challenge(const std::string& username);
 
     void update_player(const std::string& str);
     void update_world(const std::string& str);
@@ -59,6 +61,7 @@ private:
     ts::Config& config;
     Keyboard keyboard{"resources/config/keyfile.dump"};
     Balance balance;
+    ChallengeWidget challenge;
 };
 }  // namespace ts
 

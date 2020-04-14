@@ -20,6 +20,7 @@ public:
     static Player make_from_string(std::string);
 
     long balance{0};
+    std::string username;
 };
 }  // namespace ts
 

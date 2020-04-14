@@ -93,6 +93,12 @@ void ts::GameServer::on_read(web::UserID id, std::string message)
             server.write({id}, "Warning: Your client is out of date! Update now! (#2)");
             break;
         }
+        case 'L':
+        {
+            // Challenge!
+            // This is fully server-side for obvious reasons.
+            challenge(id, message.substr(ts::challenge_str.size()));
+        }
         default: ts::log::warn("Game Server: Ignoring message."); break;
     }
 }
@@ -193,17 +199,79 @@ void ts::GameServer::run_command(web::UserID id, std::string command)
     }
 }
 
-void ts::GameServer::update_world() 
+void ts::GameServer::challenge(web::UserID id, std::string str)
 {
-    send_all(construct_status());    
+    const auto [cmd, enemy] = ts::tools::splitn<2>(str, '|');
+    const auto u = users.at(id);
+    if (u.username == enemy)
+    {
+        ts::log::warn("Player ", u.username, " tried to challenge themselves!");
+        return;
+    }
+    for (size_t i = 0; i < challenges.size(); i++)
+    {
+        auto& chal = challenges[i];
+        if (!chal.is_right_challenge(u.username, enemy)) continue;
+        // else we have a challenge pre-existing
+        if (cmd == "start")
+        ts::log::message<1>("Player ", u.username, " & ", enemy, " have a challenge already!");
+        else 
+        {
+            chal.set(u.username, cmd);
+            if (chal.is_complete())
+            {
+                web::UserID enemyid;
+                ts::Player* enemyp{nullptr};
+                // challenge complete!
+                for (const auto& user : users)
+                {
+                    if (user.second.username == enemy)
+                    {
+                        enemyid = user.second.uid;
+                        enemyp = &state.players[user.second.pos];
+                        break;
+                    }
+                }
+                if (enemyp == nullptr) ts::log::error("[Game Server] Could not get enemy player for challenge!");
+                if (const auto winner = chal.winner(); winner == enemy)
+                {
+                    server.write({enemyid}, ts::challenge_str + "win" + "|" + u.username);
+                    server.write({id}, ts::challenge_str + "lose" + "|" + enemy);
+                }
+                else if (winner == "")
+                {
+                    server.write({enemyid}, ts::challenge_str + "tie" + "|" + u.username);
+                    server.write({id}, ts::challenge_str + "tie" + "|" + enemy);
+                }
+                else
+                {
+                    server.write({enemyid}, ts::challenge_str + "lose" + "|" + u.username);
+                    server.write({id}, ts::challenge_str + "win" + "|" + enemy);
+                }
+                challenges.erase(challenges.begin() + i);
+            }
+        }
+        return;
+    }
+    for (const auto& user : users)
+    {
+        if (user.second.username == enemy)
+        {
+            server.write({user.second.uid}, ts::chat_update_str + u.username + " has challenged you!");
+            challenges.emplace_back(enemy, u.username);
+            break;
+        }
+    }
 }
+
+void ts::GameServer::update_world() { send_all(construct_status()); }
 
 void ts::GameServer::update_player(web::UserID id, std::string str, bool force)
 {
     ts::log::message<1>("Game Server: Received player update: ", str);
 
-    const auto pos = users.at(id).pos;
-    ts::Player& player   = state.players[pos];
+    const auto pos     = users.at(id).pos;
+    ts::Player& player = state.players[pos];
 
     // Previous player data
     const auto [x, y]  = player.get_position();
@@ -222,6 +290,7 @@ void ts::GameServer::update_player(web::UserID id, std::string str, bool force)
         // this works this way because of rendering and things
         if (ny < y) player.move_up();
         if (ny > y) player.move_down();
+        player_tile_update(player);
     }
     if (player.updated || force)
     {
@@ -230,6 +299,19 @@ void ts::GameServer::update_player(web::UserID id, std::string str, bool force)
         ts::log::message<1>("Game Server: Sending out update string: ", update_str);
         send_all(update_str);
         player.updated = false;
+    }
+}
+
+void ts::GameServer::player_tile_update(ts::Player& player)
+{
+    if (world.tile_type_at(player.get_tile()) == ts::Tile::Type::cave)
+    {
+        // Okay, so basically, if this wasn't just a demo/prototype
+        // we wouldn't trust what the client said about balance
+        // and would force it to whatever we determine here instead.
+        // But because this is a prototype there's no real reason to implement
+        // this, and it helps with testing, so.
+        // player.balance +=
     }
 }
 
@@ -247,10 +329,7 @@ std::string ts::GameServer::construct_status() const
     return resp;
 }
 
-void ts::GameServer::respond_status(web::UserID id)
-{
-    server.write({id}, construct_status());
-}
+void ts::GameServer::respond_status(web::UserID id) { server.write({id}, construct_status()); }
 
 /**
  * Server configuration for the rest of this file.

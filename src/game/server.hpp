@@ -9,6 +9,8 @@
 #include <vector>
 #include <unordered_map>
 
+#include "game/challenge.hpp"
+
 namespace ts
 {
 class GameServer
@@ -28,6 +30,8 @@ public:
 
     void run_command(web::UserID id, std::string command);
     void update_player(web::UserID id, std::string str, bool force = false);
+    void challenge(web::UserID id, std::string str);
+    void player_tile_update(ts::Player& player);
     void update_world();
     std::string construct_status() const;
     void respond_status(web::UserID id);
@@ -46,6 +50,7 @@ private:
 
     std::unordered_map<web::UserID, ts::User> users;
     std::unordered_map<std::string, std::string> misc_config;
+    std::vector<ts::Challenge> challenges;
 
     ts::GameState state;
     ts::World world{42};

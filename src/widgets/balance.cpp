@@ -5,9 +5,8 @@
 
 #include "imgui.h"
 
-void ts::Balance::draw(bool)
+void ts::Balance::draw_self(bool)
 {
-    if (!visible) return;
     ImGui::Begin(
         "Balance", &always_open,
         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize);

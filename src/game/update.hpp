@@ -12,6 +12,7 @@ const std::string chat_update_str = "[C] Chat Message: ";
 const std::string player_update_str = "[P] ";
 const std::string status_request_str = "[S] Status Request";
 const std::string status_response_str = "[S] Status: ";
+const std::string challenge_str = "[L] Challenge: ";
 
 const std::string stat_player = "A";
 const std::string stat_world = "B";
