@@ -1,8 +1,8 @@
 #include "challenge.hpp"
 
 // Only necessary for now
-#include <cmath>
 #include <array>
+#include <cmath>
 #include "game/state.hpp"
 #include "tools/debug.hpp"
 
@@ -21,7 +21,13 @@ void ts::ChallengeWidget::draw_self(bool)
                      /*ImGuiWindowFlags_NoMove |*/ ImGuiWindowFlags_AlwaysAutoResize);
     ImGui::Text("Challenge Player?");
     for (const auto& str : names)
-        if (ImGui::Button(str.c_str())) to_challenge = str;
+    {
+        if (ImGui::Button(str.c_str()))
+        {
+            to_challenge = str;
+            challenge_callback(str);
+        }
+    }
     ImGui::End();
     return;
 }
@@ -38,11 +44,13 @@ void ts::ChallengeWidget::draw_challenge()
     }
     else
     {
+        ImGui::Text("Make your choice:");
         for (const auto& c : choices)
         {
             if (ImGui::Button(c.c_str()))
             {
                 selected = c;
+                challenge_callback("_internal");
                 break;
             }
         }

@@ -75,7 +75,8 @@ void ts::Game::update()
             case 'L':
             {
                 // Should be challenge completion!
-                const auto [stat, enemy] = ts::tools::splitn<2>(update.substr(ts::challenge_str.size()), '|');
+                const auto [stat, enemy] =
+                    ts::tools::splitn<2>(update.substr(ts::challenge_str.size()), '|');
                 size_t i = 1;
                 for (; i < state.players.size(); i++)
                 {
@@ -100,6 +101,8 @@ void ts::Game::update()
                     get_player().balance += state.players[i].balance;
                     state.players[i].balance = 0;
                 }
+                client.send(ts::player_update_str + state.players[0].get_string());
+                balance.set(get_player().balance);
                 challenge.reset();
             }
             default:
@@ -184,6 +187,7 @@ void ts::Game::handle_command(const std::string& cmd)
         {
             if (arg == "set") get_player().balance = *iv;
             if (arg == "add") get_player().balance += *iv;
+            balance.set(get_player().balance);
         }
     }
     if (startswith(command, "/seed"))
@@ -277,10 +281,6 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
             balance.set(get_player().balance);
         }
         challenge.update(state);
-        if (challenge.to_challenge)
-        {
-            client.send(ts::challenge_str + "start" + '|' + *challenge.to_challenge);
-        }
         client.send(ts::player_update_str + state.players[0].get_string());
         state.players[0].updated = false;
     }
@@ -289,7 +289,14 @@ ts::Game::Response ts::Game::handle_keyevent(const sf::Event& e)
 
 void ts::Game::run_challenge(const std::string& username)
 {
+    ts::log::message<2>("[Game] Running challenge against ", username);
+    if (username == "_internal")
+    {
+        client.send(ts::challenge_str + *challenge.selected + '|' + *challenge.to_challenge);
+        return;
+    }
     client.chat_local("Starting challenge of " + username);
+    client.send(ts::challenge_str + "start" + '|' + *challenge.to_challenge);
 }
 
 void ts::Game::render()
