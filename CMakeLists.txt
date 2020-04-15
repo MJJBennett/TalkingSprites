@@ -6,7 +6,6 @@ project(TalkingSpritesServer LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(Boost_USE_MULTITHREADED TRUE) # Prevents some miscellaneous CMake warnings
-set(JSON_BuildTests OFF CACHE INTERNAL "") # Just in case we need JSON support
 
 if (APPLE)
 add_definitions(-g -stdlib=libc++)
@@ -19,7 +18,6 @@ find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
 find_package(ImGui-SFML REQUIRED)
 find_package(Boost 1.72 COMPONENTS program_options REQUIRED)
 find_package(Threads)
-add_subdirectory(deps/nlohmann_json)
 
 # Add include directories
 include_directories("${CMAKE_SOURCE_DIR}/src")
@@ -81,11 +79,9 @@ endif ()
 # Link the application
 target_link_libraries(TalkingSprites PRIVATE sfml-graphics)
 target_link_libraries(TalkingSprites PRIVATE ImGui-SFML::ImGui-SFML)
-target_link_libraries(TalkingSprites PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(TalkingSprites PRIVATE ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(TalkingSprites PRIVATE ${Boost_LIBRARIES})
 
 target_link_libraries(TalkingSpritesServer PRIVATE sfml-graphics) # necessary for now due to character.cpp inclusion
-target_link_libraries(TalkingSpritesServer PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(TalkingSpritesServer PRIVATE ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(TalkingSpritesServer PRIVATE ${Boost_LIBRARIES})
